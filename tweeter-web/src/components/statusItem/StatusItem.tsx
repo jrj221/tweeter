@@ -30,7 +30,7 @@ const StatusItem = (props: Props) => {
       if (toUser) {
         if (!toUser.equals(displayedUser!)) {
           setDisplayedUser(toUser);
-          navigate(`/story/${toUser.alias}`);
+          navigate(`${props.featureUrl}/${toUser.alias}`);
         }
       }
     } catch (error) {
