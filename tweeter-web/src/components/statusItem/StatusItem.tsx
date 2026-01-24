@@ -8,6 +8,7 @@ import { ToastActionsContext } from "../toaster/ToastContexts";
 
 interface Props {
   status: Status;
+  featureUrl: string;
 }
 
 const StatusItem = (props: Props) => {
@@ -76,7 +77,7 @@ const StatusItem = (props: Props) => {
               </b>{" "}
               -{" "}
               <Link
-                to={`/story/${props.status.user.alias}`}
+                to={`${props.featureUrl}/${props.status.user.alias}`}
                 onClick={navigateToUser}
               >
                 {props.status.user.alias}
@@ -84,7 +85,7 @@ const StatusItem = (props: Props) => {
             </h2>
             {props.status.formattedDate}
             <br />
-            <Post status={props.status} featurePath="/story" />
+            <Post status={props.status} featurePath={props.featureUrl} />
           </div>
         </div>
       </div>

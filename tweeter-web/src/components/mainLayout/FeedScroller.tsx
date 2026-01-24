@@ -106,7 +106,7 @@ const FeedScroller = () => {
             key={index}
             className="row mb-3 mx-0 px-0 border rounded bg-white"
           >
-            <StatusItem status={item} />
+            <StatusItem status={item} featureUrl="/feed" />
           </div>
         ))}
       </InfiniteScroll>
