@@ -75,7 +75,7 @@ const Login = (props: Props) => {
   const inputFieldFactory = () => {
     return (
       <>
-        <AuthenticationFields loginOrRegisterOnEnter={loginOnEnter}/>
+        <AuthenticationFields loginOrRegisterOnEnter={loginOnEnter} setAlias={setAlias} setPassword={setPassword}/>
       </>
     );
   };
