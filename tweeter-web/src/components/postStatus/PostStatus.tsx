@@ -1,25 +1,24 @@
 import "./PostStatus.css";
 import { useState } from "react";
-import { useContext } from "react";
-import { UserInfoContext } from "../userInfo/UserInfoContexts";
 import { AuthToken, Status } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
+import { useUserInfo } from "../userInfo/UserInfoHooks";
 
 const PostStatus = () => {
   const { displayErrorMessage, displayInfoMessage, deleteMessage } = useMessageActions();
 
-  const { currentUser, authToken } = useContext(UserInfoContext);
+  const { currentUser, authToken } = useUserInfo();
   const [post, setPost] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const submitPost = async (event: React.MouseEvent) => {
     event.preventDefault();
 
-    var postingStatusToastId = "";
+    var postingStatusMessageId = "";
 
     try {
       setIsLoading(true);
-      postingStatusToastId = displayInfoMessage(
+      postingStatusMessageId = displayInfoMessage(
         "Posting status...",
         0
       );
@@ -35,7 +34,7 @@ const PostStatus = () => {
         `Failed to post the status because of exception: ${error}`,
       );
     } finally {
-      deleteMessage(postingStatusToastId);
+      deleteMessage(postingStatusMessageId);
       setIsLoading(false);
     }
   };
