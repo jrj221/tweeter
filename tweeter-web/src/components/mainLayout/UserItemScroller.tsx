@@ -7,9 +7,6 @@ import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 import { UserItemPresenter, UserItemView } from "../../presenter/UserItemPresenter";
 
-export const PAGE_SIZE = 10;
-
-
 interface Props {
     featureURL: string;
     presenterFactory: (view: UserItemView) => UserItemPresenter
@@ -35,7 +32,6 @@ const UserItemScroller = (props: Props) => {
   }
 
 
-
   // Update the displayed user context variable whenever the displayedUser url parameter changes. This allows browser forward and back buttons to work correctly.
   useEffect(() => {
     if (
@@ -58,7 +54,7 @@ const UserItemScroller = (props: Props) => {
   }, [displayedUser]);
 
   const reset = async () => {
-    setItems(() => [])
+    setItems(() => []);
     presenterRef.current!.reset();
   };
 
