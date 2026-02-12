@@ -1,39 +1,40 @@
 import { NavigateFunction } from "react-router-dom";
 import { AuthToken } from "tweeter-shared";
+import { UserService } from "../model.service/UserService";
 
 export interface AppNavbarView {
-    displayErrorMessage: (message: string) => void;
-    displayInfoMessage: (message: string, duration: number) => string;
-    deleteMessage: (messageID: string) => void;
-    navigate: NavigateFunction;
-    clearUserInfo: () => void;
+  displayErrorMessage: (message: string) => void;
+  displayInfoMessage: (message: string, duration: number) => string;
+  deleteMessage: (messageID: string) => void;
+  navigate: NavigateFunction;
+  clearUserInfo: () => void;
 }
 
 export class AppNavbarPresenter {
-    private _view: AppNavbarView;
+  private _view: AppNavbarView;
+  private userService: UserService;
 
-    public constructor(view: AppNavbarView) {
-        this._view = view;
+  public constructor(view: AppNavbarView) {
+    this._view = view;
+    this.userService = new UserService();
+  }
+
+  public async logOut(authToken: AuthToken | null) {
+    const loggingOutToastId = this._view.displayInfoMessage(
+      "Logging Out...",
+      0
+    );
+
+    try {
+      await this.userService.logout(authToken!);
+
+      this._view.deleteMessage(loggingOutToastId);
+      this._view.clearUserInfo();
+      this._view.navigate("/login");
+    } catch (error) {
+      this._view.displayErrorMessage(
+        `Failed to log user out because of exception: ${error}`
+      );
     }
-
-    private async logout(authToken: AuthToken): Promise<void> {
-        // Pause so we can see the logging out message. Delete when the call to the server is implemented.
-        await new Promise((res) => setTimeout(res, 1000));
-      };
-
-    public async logOut(authToken: AuthToken | null) {
-        const loggingOutToastId = this._view.displayInfoMessage("Logging Out...", 0);
-    
-        try {
-          await this.logout(authToken!);
-    
-          this._view.deleteMessage(loggingOutToastId);
-          this._view.clearUserInfo();
-          this._view.navigate("/login");
-        } catch (error) {
-          this._view.displayErrorMessage(
-            `Failed to log user out because of exception: ${error}`
-          );
-        }
-      };
+  }
 }
