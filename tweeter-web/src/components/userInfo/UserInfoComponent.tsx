@@ -1,5 +1,5 @@
 import "./UserInfoComponent.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "./UserInfoHooks";
@@ -9,6 +9,10 @@ const UserInfo = () => {
   const { displayErrorMessage, displayInfoMessage, deleteMessage } = useMessageActions();
 
   const { currentUser, authToken, displayedUser } = useUserInfo();
+  const [isFollower, setIsFollower] = useState(false);
+  const [followerCount, setFollowerCount] = useState(-1);
+  const [followeeCount, setFolloweeCount] = useState(-1);
+  const [isLoading, setIsLoading] = useState(false);
   const { setDisplayedUser } = useUserInfoActions();
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,6 +23,10 @@ const UserInfo = () => {
     deleteMessage: deleteMessage,
     navigate: navigate,
     setDisplayedUser: setDisplayedUser,
+    setFollowerCount: setFollowerCount,
+    setFolloweeCount: setFolloweeCount,
+    setIsLoading: setIsLoading,
+    setIsFollower: setIsFollower,
   }
 
   const presenterRef = useRef<UserInfoPresenter | null>(null);
@@ -87,16 +95,16 @@ const UserInfo = () => {
               </h2>
               <h3>{displayedUser.alias}</h3>
               <br />
-              {presenterRef.current!.followeeCount > -1 && presenterRef.current!.followerCount > -1 && (
+              {followeeCount > -1 && followerCount > -1 && (
                 <div>
-                  Followees: {presenterRef.current!.followeeCount} Followers: {presenterRef.current!.followerCount}
+                  Followees: {followeeCount} Followers: {followerCount}
                 </div>
               )}
             </div>
             <form>
               {!displayedUser.equals(currentUser) && (
                 <div className="form-group">
-                  {presenterRef.current!.isFollower ? (
+                  {isFollower ? (
                     <button
                       id="unFollowButton"
                       className="btn btn-md btn-secondary me-1"
@@ -104,7 +112,7 @@ const UserInfo = () => {
                       style={{ width: "6em" }}
                       onClick={unfollowDisplayedUser}
                     >
-                      {presenterRef.current!.isLoading ? (
+                      {isLoading ? (
                         <span
                           className="spinner-border spinner-border-sm"
                           role="status"
@@ -122,7 +130,7 @@ const UserInfo = () => {
                       style={{ width: "6em" }}
                       onClick={followDisplayedUser}
                     >
-                      {presenterRef.current!.isLoading ? (
+                      {isLoading ? (
                         <span
                           className="spinner-border spinner-border-sm"
                           role="status"
