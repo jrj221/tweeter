@@ -19,19 +19,24 @@ import { FollowerPresenter } from "./presenter/FollowerPresenter";
 import { FeedPresenter } from "./presenter/FeedPresenter";
 import { StoryPresenter } from "./presenter/StoryPresenter";
 import { StatusItemView } from "./presenter/StatusItemPresenter";
+import { AppPresenter, AppView } from "./presenter/AppPresenter";
+import { useRef } from "react";
 
 const App = () => {
   const { currentUser, authToken } = useUserInfo();
 
-  const isAuthenticated = (): boolean => {
-    return !!currentUser && !!authToken;
-  };
+  const listener: AppView = {}
+
+  const presenterRef = useRef<AppPresenter | null>(null);
+  if (!presenterRef.current) {
+    presenterRef.current = new AppPresenter(listener);
+  }
 
   return (
     <div>
       <Toaster position="top-right" />
       <BrowserRouter>
-        {isAuthenticated() ? (
+        {presenterRef.current!.isAuthenticated(currentUser, authToken) ? (
           <AuthenticatedRoutes />
         ) : (
           <UnauthenticatedRoutes />
