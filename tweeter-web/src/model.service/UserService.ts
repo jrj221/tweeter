@@ -2,6 +2,7 @@ import { Buffer } from "buffer";
 import { AuthToken, User, FakeData } from "tweeter-shared";
 
 export class UserService {
+  
   public async getUser(
     authToken: AuthToken,
     alias: string
