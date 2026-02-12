@@ -9,14 +9,12 @@ export interface StatusItemView {
 }
 
 export abstract class StatusItemPresenter {
-    private _hasMoreItems: boolean;
-    private _lastItem: Status | null;
+    private _hasMoreItems: boolean = true;
+    private _lastItem: Status | null = null;
     private _view: StatusItemView;
     private userService: UserService;
 
     public constructor(view: StatusItemView) {
-        this._hasMoreItems = true;
-        this._lastItem = null;
         this._view = view;
         this.userService = new UserService();
     }
@@ -33,19 +31,23 @@ export abstract class StatusItemPresenter {
         this._lastItem = value;
     }
 
+    protected get lastItem() {
+        return this._lastItem;
+    }
+
     protected get view() {
         return this._view;
     }
 
-    public reset = async () => {
+    public reset() {
         this._lastItem = null;
         this._hasMoreItems = true;
     };
 
-    public getUser = async (
+    public async getUser (
         authToken: AuthToken,
         alias: string
-      ): Promise<User | null> => {
+      ): Promise<User | null> {
         // TODO: Replace with the result of calling server
         return this.userService.getUser(authToken, alias);
       };
