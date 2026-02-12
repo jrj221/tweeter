@@ -1,27 +1,28 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useMessageActions } from "../toaster/MessageHooks";
+import { OAuthPresenter, OAuthView } from "../../presenter/OAuthPresenter";
+import { useRef } from "react";
 
 const OAuth = () => {
   const { displayInfoMessage } = useMessageActions();
 
+  const listener: OAuthView = {
+    displayInfoMessage: displayInfoMessage
+  }
+
+  const presenterRef = useRef<OAuthPresenter | null>(null);
+  if (!presenterRef.current) {
+    presenterRef.current = new OAuthPresenter(listener);
+  }
   
-  const displayInfoMessageWithDarkBackground = (message: string): void => {
-    displayInfoMessage(
-      message,
-      3000,
-      "text-white bg-primary"
-    );
-  };
-
-
   return (
     <div className="text-center mb-3">
       <button
         type="button"
         className="btn btn-link btn-floating mx-1"
         onClick={() =>
-          displayInfoMessageWithDarkBackground(
+          presenterRef.current!.displayInfoMessageWithDarkBackground(
             "Google registration is not implemented."
           )
         }
@@ -38,7 +39,7 @@ const OAuth = () => {
         type="button"
         className="btn btn-link btn-floating mx-1"
         onClick={() =>
-          displayInfoMessageWithDarkBackground(
+          presenterRef.current!.displayInfoMessageWithDarkBackground(
             "Facebook registration is not implemented."
           )
         }
@@ -55,7 +56,7 @@ const OAuth = () => {
         type="button"
         className="btn btn-link btn-floating mx-1"
         onClick={() =>
-          displayInfoMessageWithDarkBackground(
+          presenterRef.current!.displayInfoMessageWithDarkBackground(
             "Twitter registration is not implemented."
           )
         }
@@ -72,7 +73,7 @@ const OAuth = () => {
         type="button"
         className="btn btn-link btn-floating mx-1"
         onClick={() =>
-          displayInfoMessageWithDarkBackground(
+          presenterRef.current!.displayInfoMessageWithDarkBackground(
             "LinkedIn registration is not implemented."
           )
         }
@@ -89,7 +90,7 @@ const OAuth = () => {
         type="button"
         className="btn btn-link btn-floating mx-1"
         onClick={() =>
-          displayInfoMessageWithDarkBackground(
+          presenterRef.current!.displayInfoMessageWithDarkBackground(
             "Github registration is not implemented."
           )
         }
