@@ -1,17 +1,13 @@
 import { AuthToken, User } from "tweeter-shared";
+import { Presenter, View } from "./Presenter";
 
-export interface AppView {
+export interface AppView extends View {}
 
-}
-
-export class AppPresenter {
-    private _view: AppView;
-
-    public constructor(view: AppView) {
-        this._view = view;
-    }
-
-    public isAuthenticated(currentUser: User | null, authToken: AuthToken | null) {
-        return !!currentUser && !!authToken;
-      };
+export class AppPresenter extends Presenter<AppView> {
+	public isAuthenticated(
+		currentUser: User | null,
+		authToken: AuthToken | null
+	) {
+		return !!currentUser && !!authToken;
+	}
 }

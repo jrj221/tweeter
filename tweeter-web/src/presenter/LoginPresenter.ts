@@ -1,57 +1,42 @@
 import { User, AuthToken } from "tweeter-shared";
 import { UserService } from "../model.service/UserService";
 import { NavigateFunction } from "react-router-dom";
+import { Presenter, View } from "./Presenter";
 
-
-export interface LoginView {
-    displayErrorMessage: (message: string) => void
-    updateUserInfo: (
-        currentUser: User,
-        displayedUser: User | null,
-        authToken: AuthToken,
-        remember: boolean
-    ) => void
-    navigate: NavigateFunction
+export interface LoginView extends View {
+	updateUserInfo: (currentUser: User, displayedUser: User | null, authToken: AuthToken, remember: boolean) => void;
+	navigate: NavigateFunction;
 }
 
-export class LoginPresenter {
-  private userService: UserService;
-  private _isLoading: boolean;
-  private _view: LoginView;
+export class LoginPresenter extends Presenter<LoginView> {
+	private userService: UserService = new UserService();
+	private _isLoading: boolean = false;
 
-  public constructor(view: LoginView) {
-    this.userService = new UserService();
-    this._isLoading = false;
-    this._view = view;
-  }
+	public get isLoading() {
+		return this._isLoading;
+	}
 
-  public get isLoading() {
-    return this._isLoading;
-  }
+	public checkSubmitButtonStatus(alias: string, password: string): boolean {
+		return !alias || !password;
+	}
 
-  public checkSubmitButtonStatus(alias: string, password: string): boolean {
-    return !alias || !password;
-  };
+	public async doLogin(alias: string, password: string, originalUrl: string | undefined, rememberMe: boolean) {
+		try {
+			this._isLoading = true;
 
-  public async doLogin(alias: string, password: string, originalUrl: string | undefined, rememberMe: boolean) {
-    try {
-      this._isLoading = true;
+			const [user, authToken] = await this.userService.login(alias, password);
 
-      const [user, authToken] = await this.userService.login(alias, password);
+			this.view.updateUserInfo(user, user, authToken, rememberMe);
 
-      this._view.updateUserInfo(user, user, authToken, rememberMe);
-
-      if (!!originalUrl) {
-        this._view.navigate(originalUrl);
-      } else {
-        this._view.navigate(`/feed/${user.alias}`);
-      }
-    } catch (error) {
-      this._view.displayErrorMessage(
-        `Failed to log user in because of exception: ${error}`
-      );
-    } finally {
-      this._isLoading = false;
-    }
-  };
+			if (!!originalUrl) {
+				this.view.navigate(originalUrl);
+			} else {
+				this.view.navigate(`/feed/${user.alias}`);
+			}
+		} catch (error) {
+			this.view.displayErrorMessage(`Failed to log user in because of exception: ${error}`);
+		} finally {
+			this._isLoading = false;
+		}
+	}
 }

@@ -1,51 +1,38 @@
 import { AuthToken, User } from "tweeter-shared";
 import { Status } from "tweeter-shared/dist/model/domain/Status";
 import { StatusService } from "../model.service/StatusService";
+import { MessageView, Presenter } from "./Presenter";
 
-export interface PostStatusView {
-  displayErrorMessage: (message: string) => void;
-  displayInfoMessage: (message: string, duration: number) => string;
-  deleteMessage: (messageID: string) => void;
-  setIsLoading: (value: boolean) => void;
-  setPost: (value: string) => void;
+export interface PostStatusView extends MessageView {
+	setIsLoading: (value: boolean) => void;
+	setPost: (value: string) => void;
 }
 
-export class PostStatusPresenter {
-  private _view: PostStatusView;
-  private statusService: StatusService;
+export class PostStatusPresenter extends Presenter<PostStatusView> {
+	private statusService: StatusService = new StatusService();
 
-  public constructor(view: PostStatusView) {
-    this._view = view;
-    this.statusService = new StatusService();
-  }
+	public async submitPost(post: string, currentUser: User | null, authToken: AuthToken | null) {
+		var postingStatusMessageId = "";
 
-  public async submitPost(post: string, currentUser: User | null, authToken: AuthToken | null) {
-    var postingStatusMessageId = "";
+		try {
+			this.view.setIsLoading(true);
+			postingStatusMessageId = this.view.displayInfoMessage("Posting status...", 0);
 
-    try {
-      this._view.setIsLoading(true);
-      postingStatusMessageId = this._view.displayInfoMessage(
-        "Posting status...",
-        0
-      );
+			const status = new Status(post, currentUser!, Date.now());
 
-      const status = new Status(post, currentUser!, Date.now());
+			await this.statusService.postStatus(authToken!, status);
 
-      await this.statusService.postStatus(authToken!, status);
+			this.view.setPost("");
+			this.view.displayInfoMessage("Status posted!", 2000);
+		} catch (error) {
+			this.view.displayErrorMessage(`Failed to post the status because of exception: ${error}`);
+		} finally {
+			this.view.deleteMessage(postingStatusMessageId);
+			this.view.setIsLoading(false);
+		}
+	}
 
-      this._view.setPost("");
-      this._view.displayInfoMessage("Status posted!", 2000);
-    } catch (error) {
-      this._view.displayErrorMessage(
-        `Failed to post the status because of exception: ${error}`
-      );
-    } finally {
-      this._view.deleteMessage(postingStatusMessageId);
-      this._view.setIsLoading(false);
-    }
-  }
-
-  public checkButtonStatus(post: string, currentUser: User | null, authToken: AuthToken | null) {
-    return !post.trim() || !authToken || !currentUser;
-  };
+	public checkButtonStatus(post: string, currentUser: User | null, authToken: AuthToken | null) {
+		return !post.trim() || !authToken || !currentUser;
+	}
 }
