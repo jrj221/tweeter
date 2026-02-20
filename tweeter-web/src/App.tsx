@@ -49,7 +49,7 @@ const AuthenticatedRoutes = () => {
 	const { displayedUser } = useUserInfo();
 
 	const generateUserItemComponent = (item: User, featureURL: string): JSX.Element => {
-		return <UserItem user={item} featurePath={featureURL} />;
+		return <UserItem user={item} featureUrl={featureURL} />;
 	};
 
 	const generateStatusItemComponent = (item: Status, featureURL: string): JSX.Element => {

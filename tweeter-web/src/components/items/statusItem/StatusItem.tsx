@@ -1,7 +1,5 @@
-import { Link } from "react-router-dom";
-import Post from "./Post";
 import { Status } from "tweeter-shared";
-import { useUserNavigation } from "../../userNavigationHook/UserNavigationHook";
+import { Item } from "../Item";
 
 interface Props {
 	status: Status;
@@ -9,32 +7,17 @@ interface Props {
 }
 
 const StatusItem = (props: Props) => {
-	const navigateToUser = useUserNavigation();
-
 	return (
-		<div className="col bg-light mx-0 px-0">
-			<div className="container px-0">
-				<div className="row mx-0 px-0">
-					<div className="col-auto p-3">
-						<img src={props.status.user.imageUrl} className="img-fluid" width="80" alt="Posting user" />
-					</div>
-					<div className="col">
-						<h2>
-							<b>
-								{props.status.user.firstName} {props.status.user.lastName}
-							</b>{" "}
-							-{" "}
-							<Link to={`${props.featureUrl}/${props.status.user.alias}`} onClick={navigateToUser}>
-								{props.status.user.alias}
-							</Link>
-						</h2>
-						{props.status.formattedDate}
-						<br />
-						<Post status={props.status} featurePath={props.featureUrl} />
-					</div>
-				</div>
-			</div>
-		</div>
+		<Item
+			imageUrl={props.status.user.imageUrl}
+			firstName={props.status.user.firstName}
+			lastName={props.status.user.lastName}
+			userAlias={props.status.user.alias}
+			featureUrl={props.featureUrl}
+			isPost={true}
+			formattedDate={props.status.formattedDate}
+			status={props.status}
+		/>
 	);
 };
 
