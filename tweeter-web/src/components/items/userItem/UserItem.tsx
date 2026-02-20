@@ -7,16 +7,7 @@ interface Props {
 }
 
 const UserItem = (props: Props) => {
-	return (
-		<Item
-			imageUrl={props.user.imageUrl}
-			firstName={props.user.firstName}
-			lastName={props.user.firstName}
-			userAlias={props.user.alias}
-			featureUrl={props.featureUrl}
-			isPost={false}
-		/>
-	);
+	return <Item user={props.user} featureUrl={props.featureUrl} isPost={false} />;
 };
 
 export default UserItem;
