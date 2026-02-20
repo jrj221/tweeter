@@ -61,24 +61,26 @@ export class RegisterPresenter extends Presenter<RegisterView> {
 	}
 
 	public async doRegister(firstName: string, lastName: string, password: string, alias: string, rememberMe: boolean) {
-		try {
-			this._isLoading = true;
+		await this.doFailureReportingOperation(
+			async () => {
+				this._isLoading = true;
 
-			const [user, authToken] = await this.userService.register(
-				firstName,
-				lastName,
-				alias,
-				password,
-				this._imageBytes,
-				this._imageFileExtension
-			);
+				const [user, authToken] = await this.userService.register(
+					firstName,
+					lastName,
+					alias,
+					password,
+					this._imageBytes,
+					this._imageFileExtension
+				);
 
-			this.view.updateUserInfo(user, user, authToken, rememberMe);
-			this.view.navigate(`/feed/${user.alias}`);
-		} catch (error) {
-			this.view.displayErrorMessage(`Failed to register user because of exception: ${error}`);
-		} finally {
-			this._isLoading = false;
-		}
+				this.view.updateUserInfo(user, user, authToken, rememberMe);
+				this.view.navigate(`/feed/${user.alias}`);
+			},
+			"register user",
+			() => {
+				this._isLoading = false;
+			}
+		);
 	}
 }
