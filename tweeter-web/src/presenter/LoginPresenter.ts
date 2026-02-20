@@ -1,12 +1,7 @@
-import { User, AuthToken } from "tweeter-shared";
 import { UserService } from "../model.service/UserService";
-import { NavigateFunction } from "react-router-dom";
-import { Presenter, View } from "./Presenter";
+import { AuthenticationView, Presenter } from "./Presenter";
 
-export interface LoginView extends View {
-	updateUserInfo: (currentUser: User, displayedUser: User | null, authToken: AuthToken, remember: boolean) => void;
-	navigate: NavigateFunction;
-}
+export interface LoginView extends AuthenticationView {}
 
 export class LoginPresenter extends Presenter<LoginView> {
 	private userService: UserService = new UserService();

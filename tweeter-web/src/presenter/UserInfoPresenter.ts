@@ -1,11 +1,8 @@
 import { AuthToken, User } from "tweeter-shared";
 import { FollowService } from "../model.service/FollowService";
-import { NavigateFunction } from "react-router-dom";
-import { MessageView, Presenter } from "./Presenter";
+import { DisplayUserView, MessageView, Presenter } from "./Presenter";
 
-export interface UserInfoView extends MessageView {
-	navigate: NavigateFunction;
-	setDisplayedUser: (user: User) => void;
+export interface UserInfoView extends MessageView, DisplayUserView {
 	setFollowerCount: (value: number) => void;
 	setFolloweeCount: (value: number) => void;
 	setIsLoading: (value: boolean) => void;

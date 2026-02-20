@@ -1,3 +1,6 @@
+import { NavigateFunction } from "react-router";
+import { User, AuthToken } from "tweeter-shared";
+
 export interface View {
 	displayErrorMessage: (message: string) => void;
 }
@@ -5,6 +8,18 @@ export interface View {
 export interface MessageView extends View {
 	displayInfoMessage: (message: string, duration: number, bootstrapClasses?: string) => string;
 	deleteMessage: (messageID: string) => void;
+}
+
+export interface NavigateView extends View {
+	navigate: NavigateFunction;
+}
+
+export interface AuthenticationView extends NavigateView {
+	updateUserInfo: (currentUser: User, displayedUser: User | null, authToken: AuthToken, remember: boolean) => void;
+}
+
+export interface DisplayUserView extends NavigateView {
+	setDisplayedUser: (user: User) => void;
 }
 
 export abstract class Presenter<V extends View> {
