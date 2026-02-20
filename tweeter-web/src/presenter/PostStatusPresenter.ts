@@ -13,23 +13,24 @@ export class PostStatusPresenter extends Presenter<PostStatusView> {
 
 	public async submitPost(post: string, currentUser: User | null, authToken: AuthToken | null) {
 		var postingStatusMessageId = "";
+		await this.doFailureReportingOperation(
+			async () => {
+				this.view.setIsLoading(true);
+				postingStatusMessageId = this.view.displayInfoMessage("Posting status...", 0);
 
-		try {
-			this.view.setIsLoading(true);
-			postingStatusMessageId = this.view.displayInfoMessage("Posting status...", 0);
+				const status = new Status(post, currentUser!, Date.now());
 
-			const status = new Status(post, currentUser!, Date.now());
+				await this.statusService.postStatus(authToken!, status);
 
-			await this.statusService.postStatus(authToken!, status);
-
-			this.view.setPost("");
-			this.view.displayInfoMessage("Status posted!", 2000);
-		} catch (error) {
-			this.view.displayErrorMessage(`Failed to post the status because of exception: ${error}`);
-		} finally {
-			this.view.deleteMessage(postingStatusMessageId);
-			this.view.setIsLoading(false);
-		}
+				this.view.setPost("");
+				this.view.displayInfoMessage("Status posted!", 2000);
+			},
+			"post the status",
+			() => {
+				this.view.deleteMessage(postingStatusMessageId);
+				this.view.setIsLoading(false);
+			}
+		);
 	}
 
 	public checkButtonStatus(post: string, currentUser: User | null, authToken: AuthToken | null) {
