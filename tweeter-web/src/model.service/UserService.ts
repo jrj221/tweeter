@@ -15,13 +15,7 @@ export class UserService implements Service {
 
 	public async login(alias: string, password: string): Promise<[User, AuthToken]> {
 		// TODO: Replace with the result of calling the server
-		const user = FakeData.instance.firstUser;
-
-		if (user === null) {
-			throw new Error("Invalid alias or password");
-		}
-
-		return [user, FakeData.instance.authToken];
+		return this.returnUser();
 	}
 
 	public async register(
@@ -36,12 +30,16 @@ export class UserService implements Service {
 		const imageStringBase64: string = Buffer.from(userImageBytes).toString("base64");
 
 		// TODO: Replace with the result of calling the server
+		return this.returnUser();
+	}
+
+	private async returnUser() {
 		const user = FakeData.instance.firstUser;
 
 		if (user === null) {
 			throw new Error("Invalid registration");
 		}
 
-		return [user, FakeData.instance.authToken];
+		return [user, FakeData.instance.authToken] as [User, AuthToken]; // TS interprets it as an array instead of tuple without this cast idk why
 	}
 }
