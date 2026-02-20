@@ -2,12 +2,22 @@ import { AuthToken, User, FakeData } from "tweeter-shared";
 import { Service } from "./Service";
 
 export class FollowService implements Service {
-	public async loadMoreFollowees(authToken: AuthToken, userAlias: string, pageSize: number, lastItem: User | null): Promise<[User[], boolean]> {
+	public async loadMoreFollowees(
+		authToken: AuthToken,
+		userAlias: string,
+		pageSize: number,
+		lastItem: User | null
+	): Promise<[User[], boolean]> {
 		// TODO: Replace with the result of calling server
 		return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
 	}
 
-	public async loadMoreFollowers(authToken: AuthToken, userAlias: string, pageSize: number, lastItem: User | null): Promise<[User[], boolean]> {
+	public async loadMoreFollowers(
+		authToken: AuthToken,
+		userAlias: string,
+		pageSize: number,
+		lastItem: User | null
+	): Promise<[User[], boolean]> {
 		// TODO: Replace with the result of calling server
 		return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
 	}
@@ -42,11 +52,17 @@ export class FollowService implements Service {
 		return [followerCount, followeeCount];
 	}
 
-	public async follow(authToken: AuthToken, userToFollow: User): Promise<[followerCount: number, followeeCount: number]> {
+	public follow = async (
+		authToken: AuthToken,
+		userToFollow: User
+	): Promise<[followerCount: number, followeeCount: number]> => {
 		return await this.changeFollowingStatus(authToken, userToFollow);
-	}
+	};
 
-	public async unfollow(authToken: AuthToken, userToUnfollow: User): Promise<[followerCount: number, followeeCount: number]> {
+	public unfollow = async (
+		authToken: AuthToken,
+		userToUnfollow: User
+	): Promise<[followerCount: number, followeeCount: number]> => {
 		return await this.changeFollowingStatus(authToken, userToUnfollow);
-	}
+	};
 }
