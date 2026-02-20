@@ -1,19 +1,15 @@
 import { UserService } from "../model.service/UserService";
 import { Buffer } from "buffer";
-import { AuthenticationView, Presenter } from "./Presenter";
+import { AuthenticationView } from "./Presenter";
+import { AuthenticationPresenter } from "./AuthenticationPresenter";
 
 export interface RegisterView extends AuthenticationView {}
 
-export class RegisterPresenter extends Presenter<RegisterView> {
-	private userService: UserService = new UserService();
-	private _isLoading: boolean = false;
+export class RegisterPresenter extends AuthenticationPresenter<RegisterView> {
 	private _imageUrl: string = "";
 	private _imageBytes: Uint8Array = new Uint8Array();
 	private _imageFileExtension: string = "";
-
-	public get isLoading() {
-		return this._isLoading;
-	}
+	private _userService: UserService = new UserService();
 
 	public get imageUrl() {
 		return this._imageUrl;
@@ -56,11 +52,10 @@ export class RegisterPresenter extends Presenter<RegisterView> {
 	}
 
 	public async doRegister(firstName: string, lastName: string, password: string, alias: string, rememberMe: boolean) {
-		await this.doFailureReportingOperation(
-			async () => {
-				this._isLoading = true;
-
-				const [user, authToken] = await this.userService.register(
+		await this.doAuthenticate(
+			rememberMe,
+			() => {
+				return this._userService.register(
 					firstName,
 					lastName,
 					alias,
@@ -68,14 +63,11 @@ export class RegisterPresenter extends Presenter<RegisterView> {
 					this._imageBytes,
 					this._imageFileExtension
 				);
-
-				this.view.updateUserInfo(user, user, authToken, rememberMe);
+			},
+			(user) => {
 				this.view.navigate(`/feed/${user.alias}`);
 			},
-			"register user",
-			() => {
-				this._isLoading = false;
-			}
+			"register user"
 		);
 	}
 }
