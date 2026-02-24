@@ -45,8 +45,23 @@ describe("PostStatusPresenter", () => {
 		when(mockPostStatusPresenterView.displayInfoMessage("Posting status...", 0)).thenReturn("postID123");
 		await postStatusPresenter.submitPost(post, currentUser, authToken);
 
-		verify(mockPostStatusPresenterView.deleteMessage("postID123")).once(); // Clears previous post
+		verify(mockPostStatusPresenterView.deleteMessage("postID123")).once(); // Clears previous info message
 		verify(mockPostStatusPresenterView.setPost("")).once(); // Clears the post
 		verify(mockPostStatusPresenterView.displayInfoMessage("Status posted!", 2000)).once(); // Displays "Status posted" message
+	});
+
+	it("tells the view to clear the info message and display an error message but does not tell it to clear the post or display a status posted message when posting is unsuccessful", async () => {
+		when(mockPostStatusPresenterView.displayInfoMessage("Posting status...", 0)).thenReturn("postID123");
+		when(mockStatusService.postStatus(anything(), anything())).thenThrow(new Error("An error occurred"));
+		await postStatusPresenter.submitPost(post, currentUser, authToken);
+
+		verify(mockPostStatusPresenterView.deleteMessage("postID123")).once(); // Clears previous info message
+		verify(
+			mockPostStatusPresenterView.displayErrorMessage(
+				"Failed to post the status because of exception: An error occurred"
+			)
+		).once(); // Displays an error message
+		verify(mockPostStatusPresenterView.setPost("")).never(); // Does not clear the post
+		verify(mockPostStatusPresenterView.displayInfoMessage("Status posted!", 2000)).never(); // Does not display "Status posted" message
 	});
 });
