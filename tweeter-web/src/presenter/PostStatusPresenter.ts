@@ -9,7 +9,11 @@ export interface PostStatusView extends MessageView {
 }
 
 export class PostStatusPresenter extends Presenter<PostStatusView> {
-	private statusService: StatusService = new StatusService();
+	private _statusService: StatusService = new StatusService();
+
+	public get statusService(): StatusService {
+		return this._statusService;
+	}
 
 	public async submitPost(post: string, currentUser: User | null, authToken: AuthToken | null) {
 		var postingStatusMessageId = "";
