@@ -40,4 +40,13 @@ describe("PostStatusPresenter", () => {
 		let [, status] = capture(mockStatusService.postStatus).last();
 		expect(status.post).toEqual(post);
 	});
+
+	it("tells the view to clear the info message that was displayed previously, clear the post, and display a status posted message when posting is successful", async () => {
+		when(mockPostStatusPresenterView.displayInfoMessage("Posting status...", 0)).thenReturn("postID123");
+		await postStatusPresenter.submitPost(post, currentUser, authToken);
+
+		verify(mockPostStatusPresenterView.deleteMessage("postID123")).once(); // Clears previous post
+		verify(mockPostStatusPresenterView.setPost("")).once(); // Clears the post
+		verify(mockPostStatusPresenterView.displayInfoMessage("Status posted!", 2000)).once(); // Displays "Status posted" message
+	});
 });
