@@ -14,6 +14,23 @@ describe("Login Component", () => {
 
 		expect(signInButton).toBeDisabled();
 	});
+
+	it("enables the sign-in button if both alias and password fields have text", async () => {
+		const { user, signInButton, aliasField, passwordField } = renderLoginAndGetElements("/");
+
+		// Should be disabled with just alias
+		await user.type(aliasField, "myAlias");
+		expect(signInButton).toBeDisabled();
+
+		// Should be disabled with just password
+		await user.clear(aliasField);
+		await user.type(passwordField, "myPassword");
+		expect(signInButton).toBeDisabled();
+
+		// Should be enabled with both
+		await user.type(aliasField, "myAlias");
+		expect(signInButton).toBeEnabled();
+	});
 });
 
 function renderLogin(originalUrl: string) {
@@ -33,5 +50,5 @@ function renderLoginAndGetElements(originalUrl: string) {
 	const aliasField = screen.getByLabelText("alias");
 	const passwordField = screen.getByLabelText("password");
 
-	return { signInButton, aliasField, passwordField };
+	return { user, signInButton, aliasField, passwordField };
 }
