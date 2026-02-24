@@ -6,6 +6,7 @@ import { userEvent } from "@testing-library/user-event";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import "@testing-library/jest-dom";
 import { fab } from "@fortawesome/free-brands-svg-icons";
+import { sign } from "crypto";
 library.add(fab);
 
 describe("Login Component", () => {
@@ -18,18 +19,30 @@ describe("Login Component", () => {
 	it("enables the sign-in button if both alias and password fields have text", async () => {
 		const { user, signInButton, aliasField, passwordField } = renderLoginAndGetElements("/");
 
-		// Should be disabled with just alias
-		await user.type(aliasField, "myAlias");
-		expect(signInButton).toBeDisabled();
-
-		// Should be disabled with just password
-		await user.clear(aliasField);
+		await user.type(aliasField, "myAlias"); // How do you deduplicate test code?
 		await user.type(passwordField, "myPassword");
-		expect(signInButton).toBeDisabled();
+		expect(signInButton).toBeEnabled();
+	});
+
+	it("disables the sign-in button if either the alias or the password is cleared", async () => {
+		const { user, signInButton, aliasField, passwordField } = renderLoginAndGetElements("/");
 
 		// Should be enabled with both
 		await user.type(aliasField, "myAlias");
+		await user.type(passwordField, "myPassword");
 		expect(signInButton).toBeEnabled();
+
+		// Should not be enabled with just password
+		await user.clear(aliasField);
+		expect(signInButton).toBeDisabled();
+
+		// Putting the alias back should enable it again
+		await user.type(aliasField, "myAlias");
+		expect(signInButton).toBeEnabled();
+
+		// Should not be enabled with just alias
+		await user.clear(passwordField);
+		expect(signInButton).toBeDisabled();
 	});
 });
 
