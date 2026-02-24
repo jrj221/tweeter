@@ -38,4 +38,11 @@ describe("AppNavbarPresenter", () => {
 		// let [capturedAuthToken] = capture(mockService.logout).last();
 		// expect(capturedAuthToken).toEqual(authToken);
 	});
+
+	it("tells the view to clear the info message that was displayed previously, clear the user info, and navigate to the login page when logout is successful", async () => {
+		await appNavbarPresenter.logOut(authToken);
+		verify(mockAppNavbarPresenterView.deleteMessage(anything())).once();
+		verify(mockAppNavbarPresenterView.clearUserInfo()).once();
+		verify(mockAppNavbarPresenterView.navigate("/login")).once();
+	});
 });
