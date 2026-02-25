@@ -25,6 +25,14 @@ describe("PostStatus Component", () => {
 		expect(postStatusButton).toBeDisabled();
 		expect(clearButton).toBeDisabled();
 	});
+
+	it("enables both Post Status and Clear buttons when the text field has text", () => {
+		const { postStatusButton, clearButton, textField, user } = renderPostStatusAndGetElements();
+
+		user.type(textField, "this is my post");
+		expect(postStatusButton).toBeEnabled();
+		expect(clearButton).toBeEnabled();
+	});
 });
 
 function renderPostStatus() {
@@ -38,5 +46,6 @@ function renderPostStatusAndGetElements() {
 
 	const postStatusButton = screen.getByRole("button", { name: /Post Status/i });
 	const clearButton = screen.getByRole("button", { name: /Clear/i });
-	return { postStatusButton, clearButton };
+	const textField = screen.getByLabelText("postStatusTextField");
+	return { postStatusButton, clearButton, textField, user };
 }
