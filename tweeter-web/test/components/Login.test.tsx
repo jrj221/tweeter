@@ -6,8 +6,9 @@ import { userEvent } from "@testing-library/user-event";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import "@testing-library/jest-dom";
 import { fab } from "@fortawesome/free-brands-svg-icons";
-import { sign } from "crypto";
+import { LoginPresenter } from "../../src/presenter/LoginPresenter";
 library.add(fab);
+import { mock, instance, verify } from "@typestrong/ts-mockito";
 
 describe("Login Component", () => {
 	it("starts with the sign-in button disabled", () => {
@@ -44,20 +45,44 @@ describe("Login Component", () => {
 		await user.clear(passwordField);
 		expect(signInButton).toBeDisabled();
 	});
+
+	it("calls the presenter's login method with the correct parameters when the sign-in button is pressed", async () => {
+		const mockPresenter = mock<LoginPresenter>();
+		const mockPresenterInstance = instance(mockPresenter);
+
+		const originalurl = "htpps://somewhere.com";
+		const alias = "myAlias";
+		const password = "myPassword";
+
+		const { user, signInButton, aliasField, passwordField } = renderLoginAndGetElements(
+			originalurl,
+			mockPresenterInstance
+		);
+
+		await user.type(aliasField, alias);
+		await user.type(passwordField, password);
+		await user.click(signInButton);
+
+		verify(mockPresenter.doLogin(alias, password, originalurl, false)).once();
+	});
 });
 
-function renderLogin(originalUrl: string) {
+function renderLogin(originalUrl: string, presenter?: LoginPresenter) {
 	return render(
 		<MemoryRouter>
-			<Login originalUrl={originalUrl} />
+			{!!presenter ? (
+				<Login originalUrl={originalUrl} presenter={presenter} />
+			) : (
+				<Login originalUrl={originalUrl} />
+			)}
 		</MemoryRouter>
 	);
 }
 
-function renderLoginAndGetElements(originalUrl: string) {
+function renderLoginAndGetElements(originalUrl: string, presenter?: LoginPresenter) {
 	const user = userEvent.setup();
 
-	renderLogin(originalUrl);
+	renderLogin(originalUrl, presenter);
 
 	const signInButton = screen.getByRole("button", { name: /Sign in/i }); // "i" means case insensitive
 	const aliasField = screen.getByLabelText("alias");
