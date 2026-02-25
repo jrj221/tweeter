@@ -3,8 +3,13 @@ import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import PostStatus from "../../src/components/postStatus/PostStatus";
 import { useUserInfo } from "../../src/components/userInfo/UserInfoHooks";
+import { PostStatusPresenter } from "../../src/presenter/PostStatusPresenter";
+import { mock, instance, verify, capture } from "@typestrong/ts-mockito";
+import { AuthToken, User } from "tweeter-shared";
+import { act } from "react";
+import "@testing-library/jest-dom";
 
-// Mocks the userInfoHook which PostStatus needs I guess
+// Mocks the useUserInfo hook which PostStatus needs I guess
 jest.mock("../../src/components/userInfo/UserInfoHooks", () => ({
 	...jest.requireActual("../../src/components/userInfo/UserInfoHooks"),
 	__esModule: true,
@@ -12,6 +17,9 @@ jest.mock("../../src/components/userInfo/UserInfoHooks", () => ({
 }));
 
 describe("PostStatus Component", () => {
+	const mockUserInstance = new User("firstName", "lastName", "alias", "imageUrl");
+	const mockAuthTokenInstance = new AuthToken("token", Date.now());
+
 	beforeAll(() => {
 		(useUserInfo as jest.Mock).mockReturnValue({
 			currentUser: mockUserInstance,
@@ -26,37 +34,60 @@ describe("PostStatus Component", () => {
 		expect(clearButton).toBeDisabled();
 	});
 
-	it("enables both Post Status and Clear buttons when the text field has text", () => {
+	it("enables both Post Status and Clear buttons when the text field has text", async () => {
 		const { postStatusButton, clearButton, textField, user } = renderPostStatusAndGetElements();
 
-		user.type(textField, "this is my post");
+		await act(async () => {
+			await user.type(textField, "this is my post");
+		});
 		expect(postStatusButton).toBeEnabled();
 		expect(clearButton).toBeEnabled();
 	});
 
-	it("disables both Post Status and Clear buttons when the text field is cleared", () => {
+	it("disables both Post Status and Clear buttons when the text field is cleared", async () => {
 		const { postStatusButton, clearButton, textField, user } = renderPostStatusAndGetElements();
 
 		// duplication is next three lines from second test
-		user.type(textField, "this is my post");
+		await act(async () => {
+			await user.type(textField, "this is my post");
+		});
 		expect(postStatusButton).toBeEnabled();
 		expect(clearButton).toBeEnabled();
 
-		user.clear(textField);
+		await act(async () => {
+			await user.clear(textField);
+		});
 		// duplication in next two lines from the first test
 		expect(postStatusButton).toBeDisabled();
 		expect(clearButton).toBeDisabled();
 	});
+
+	it("calls the presenter's postStatus method (mine is called submitPost) with correct parameters when the PostStatus button is pressed", async () => {
+		const mockPresenter = mock(PostStatusPresenter);
+		const mockPresenterInstance = instance(mockPresenter);
+
+		const { user, textField, postStatusButton } = renderPostStatusAndGetElements(mockPresenterInstance);
+		const post = "this is my post";
+
+		await act(async () => {
+			await user.type(textField, post);
+		});
+		await act(async () => {
+			await user.click(postStatusButton);
+		});
+
+		verify(mockPresenter.submitPost(post, mockUserInstance, mockAuthTokenInstance)).once();
+	});
 });
 
-function renderPostStatus() {
-	return render(<PostStatus />);
+function renderPostStatus(presenter?: PostStatusPresenter) {
+	return render(<>{!!presenter ? <PostStatus presenter={presenter} /> : <PostStatus />}</>);
 }
 
-function renderPostStatusAndGetElements() {
+function renderPostStatusAndGetElements(presenter?: PostStatusPresenter) {
 	const user = userEvent.setup();
 
-	renderPostStatus();
+	renderPostStatus(presenter);
 
 	const postStatusButton = screen.getByRole("button", { name: /Post Status/i });
 	const clearButton = screen.getByRole("button", { name: /Clear/i });

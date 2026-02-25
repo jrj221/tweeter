@@ -2,6 +2,7 @@ import React from "react";
 import { MemoryRouter } from "react-router-dom";
 import Login from "../../src/components/authentication/login/Login";
 import { render, screen } from "@testing-library/react";
+import { act } from "react";
 import { userEvent } from "@testing-library/user-event";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import "@testing-library/jest-dom";
@@ -47,7 +48,7 @@ describe("Login Component", () => {
 	});
 
 	it("calls the presenter's login method with the correct parameters when the sign-in button is pressed", async () => {
-		const mockPresenter = mock<LoginPresenter>();
+		const mockPresenter = mock(LoginPresenter);
 		const mockPresenterInstance = instance(mockPresenter);
 
 		const originalurl = "htpps://somewhere.com";
@@ -59,9 +60,15 @@ describe("Login Component", () => {
 			mockPresenterInstance
 		);
 
-		await user.type(aliasField, alias);
-		await user.type(passwordField, password);
-		await user.click(signInButton);
+		await act(async () => {
+			await user.type(aliasField, alias);
+		});
+		await act(async () => {
+			await user.type(passwordField, password);
+		});
+		await act(async () => {
+			await user.click(signInButton);
+		});
 
 		verify(mockPresenter.doLogin(alias, password, originalurl, false)).once();
 	});
