@@ -33,6 +33,20 @@ describe("PostStatus Component", () => {
 		expect(postStatusButton).toBeEnabled();
 		expect(clearButton).toBeEnabled();
 	});
+
+	it("disables both Post Status and Clear buttons when the text field is cleared", () => {
+		const { postStatusButton, clearButton, textField, user } = renderPostStatusAndGetElements();
+
+		// duplication is next three lines from second test
+		user.type(textField, "this is my post");
+		expect(postStatusButton).toBeEnabled();
+		expect(clearButton).toBeEnabled();
+
+		user.clear(textField);
+		// duplication in next two lines from the first test
+		expect(postStatusButton).toBeDisabled();
+		expect(clearButton).toBeDisabled();
+	});
 });
 
 function renderPostStatus() {
