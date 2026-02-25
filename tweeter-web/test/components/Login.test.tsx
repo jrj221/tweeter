@@ -3,7 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import Login from "../../src/components/authentication/login/Login";
 import { render, screen } from "@testing-library/react";
 import { act } from "react";
-import { userEvent } from "@testing-library/user-event";
+import { UserEvent, userEvent } from "@testing-library/user-event";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import "@testing-library/jest-dom";
 import { fab } from "@fortawesome/free-brands-svg-icons";
@@ -21,29 +21,31 @@ describe("Login Component", () => {
 	it("enables the sign-in button if both alias and password fields have text", async () => {
 		const { user, signInButton, aliasField, passwordField } = renderLoginAndGetElements("/");
 
-		await user.type(aliasField, "myAlias"); // How do you deduplicate test code?
-		await user.type(passwordField, "myPassword");
-		expect(signInButton).toBeEnabled();
+		await expectEnabledWithBoth(user, aliasField, passwordField, signInButton);
 	});
 
 	it("disables the sign-in button if either the alias or the password is cleared", async () => {
 		const { user, signInButton, aliasField, passwordField } = renderLoginAndGetElements("/");
 
 		// Should be enabled with both
-		await user.type(aliasField, "myAlias");
-		await user.type(passwordField, "myPassword");
-		expect(signInButton).toBeEnabled();
+		await expectEnabledWithBoth(user, aliasField, passwordField, signInButton);
 
 		// Should not be enabled with just password
-		await user.clear(aliasField);
+		await act(async () => {
+			await user.clear(aliasField);
+		});
 		expect(signInButton).toBeDisabled();
 
 		// Putting the alias back should enable it again
-		await user.type(aliasField, "myAlias");
+		await act(async () => {
+			await user.type(aliasField, "myAlias");
+		});
 		expect(signInButton).toBeEnabled();
 
 		// Should not be enabled with just alias
-		await user.clear(passwordField);
+		await act(async () => {
+			await user.clear(passwordField);
+		});
 		expect(signInButton).toBeDisabled();
 	});
 
@@ -60,12 +62,7 @@ describe("Login Component", () => {
 			mockPresenterInstance
 		);
 
-		await act(async () => {
-			await user.type(aliasField, alias);
-		});
-		await act(async () => {
-			await user.type(passwordField, password);
-		});
+		await typeAliasAndPassword(user, aliasField, passwordField);
 		await act(async () => {
 			await user.click(signInButton);
 		});
@@ -96,4 +93,29 @@ function renderLoginAndGetElements(originalUrl: string, presenter?: LoginPresent
 	const passwordField = screen.getByLabelText("password");
 
 	return { user, signInButton, aliasField, passwordField };
+}
+
+async function typeAliasAndPassword(
+	user: UserEvent,
+	aliasField: HTMLElement,
+	passwordField: HTMLElement,
+	alias: string = "myAlias",
+	password: string = "myPassword"
+) {
+	await act(async () => {
+		await user.type(aliasField, alias);
+	});
+	await act(async () => {
+		await user.type(passwordField, password);
+	});
+}
+
+async function expectEnabledWithBoth(
+	user: UserEvent,
+	aliasField: HTMLElement,
+	passwordField: HTMLElement,
+	signInButton: HTMLElement
+) {
+	await typeAliasAndPassword(user, aliasField, passwordField);
+	expect(signInButton).toBeEnabled();
 }

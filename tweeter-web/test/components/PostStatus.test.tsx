@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { userEvent } from "@testing-library/user-event";
+import { UserEvent, userEvent } from "@testing-library/user-event";
 import PostStatus from "../../src/components/postStatus/PostStatus";
 import { useUserInfo } from "../../src/components/userInfo/UserInfoHooks";
 import { PostStatusPresenter } from "../../src/presenter/PostStatusPresenter";
@@ -30,8 +30,7 @@ describe("PostStatus Component", () => {
 	it("starts with the Post Status and Clear buttons disabled", () => {
 		const { postStatusButton, clearButton } = renderPostStatusAndGetElements();
 
-		expect(postStatusButton).toBeDisabled();
-		expect(clearButton).toBeDisabled();
+		expectButtonsDisabled(postStatusButton, clearButton);
 	});
 
 	it("enables both Post Status and Clear buttons when the text field has text", async () => {
@@ -40,26 +39,20 @@ describe("PostStatus Component", () => {
 		await act(async () => {
 			await user.type(textField, "this is my post");
 		});
-		expect(postStatusButton).toBeEnabled();
-		expect(clearButton).toBeEnabled();
+		expectButtonsEnabled(postStatusButton, clearButton);
+
+		await expectButtonsEnabledWithText(user, textField, postStatusButton, clearButton);
 	});
 
 	it("disables both Post Status and Clear buttons when the text field is cleared", async () => {
 		const { postStatusButton, clearButton, textField, user } = renderPostStatusAndGetElements();
 
-		// duplication is next three lines from second test
-		await act(async () => {
-			await user.type(textField, "this is my post");
-		});
-		expect(postStatusButton).toBeEnabled();
-		expect(clearButton).toBeEnabled();
+		await expectButtonsEnabledWithText(user, textField, postStatusButton, clearButton);
 
 		await act(async () => {
 			await user.clear(textField);
 		});
-		// duplication in next two lines from the first test
-		expect(postStatusButton).toBeDisabled();
-		expect(clearButton).toBeDisabled();
+		expectButtonsDisabled(postStatusButton, clearButton);
 	});
 
 	it("calls the presenter's postStatus method (mine is called submitPost) with correct parameters when the PostStatus button is pressed", async () => {
@@ -93,4 +86,26 @@ function renderPostStatusAndGetElements(presenter?: PostStatusPresenter) {
 	const clearButton = screen.getByRole("button", { name: /Clear/i });
 	const textField = screen.getByLabelText("postStatusTextField");
 	return { postStatusButton, clearButton, textField, user };
+}
+
+function expectButtonsEnabled(postStatusButton: HTMLElement, clearButton: HTMLElement) {
+	expect(postStatusButton).toBeEnabled();
+	expect(clearButton).toBeEnabled();
+}
+
+function expectButtonsDisabled(postStatusButton: HTMLElement, clearButton: HTMLElement) {
+	expect(postStatusButton).toBeDisabled();
+	expect(clearButton).toBeDisabled();
+}
+
+async function expectButtonsEnabledWithText(
+	user: UserEvent,
+	textField: HTMLElement,
+	postStatusButton: HTMLElement,
+	clearButton: HTMLElement
+) {
+	await act(async () => {
+		await user.type(textField, "this is my post");
+	});
+	expectButtonsEnabled(postStatusButton, clearButton);
 }
