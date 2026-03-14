@@ -15,17 +15,20 @@ export { AuthToken } from "./model/domain/AuthToken";
 // DTOs
 //
 export type { UserDTO } from "./model/dto/UserDTO";
+export type { StatusDTO } from "./model/dto/StatusDTO";
 
 //
 // Requests
 //
 export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequest";
+export type { PagedStatusItemRequest } from "./model/net/request/PagedStatusItemRequest";
 export type { TweeterRequest } from "./model/net/request/TweeterRequest";
 
 //
 // Responses
 //
 export type { PagedUserItemResponse } from "./model/net/response/PagedUserItemResponse";
+export type { PagedStatusItemResponse } from "./model/net/response/PagedStatusItemResponse";
 export type { TweeterResponse } from "./model/net/response/TweeterResponse";
 
 // 

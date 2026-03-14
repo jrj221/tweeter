@@ -1,3 +1,5 @@
+import { PostSegmentDTO } from "../dto/PostSegmentDTO";
+
 export enum Type {
   text = "Text",
   alias = "Alias",
@@ -36,6 +38,21 @@ export class PostSegment {
   }
 
   public get type(): Type {
-    return this._type;
+    return this._type;  
   }
+
+  public get DTO(): PostSegmentDTO {
+        return {
+          text: this.text,
+          startPosition: this.startPostion,
+          endPosition: this.endPosition,
+          type: this.type
+        }
+      } 
+     
+      public static fromDTO(dto: PostSegmentDTO | null): PostSegment | null {
+        // dto.type should be one of these since it was a valid Type before sending as a request
+          const type = dto?.type === "Text" ? Type.text : dto?.type === "Alias" ? Type.alias : dto?.type === "URL" ? Type.url : Type.newline;
+          return dto === null ? null : new PostSegment(dto.text, dto.startPosition, dto.endPosition, type);
+      }
 }
