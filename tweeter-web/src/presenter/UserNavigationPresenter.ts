@@ -1,5 +1,5 @@
 import { AuthToken } from "tweeter-shared/dist/model/domain/AuthToken";
-import { UserService } from "../model.service/UserService";
+import { UserService } from "../model/service/UserService";
 import { User } from "tweeter-shared";
 import { DisplayUserView, Presenter } from "./Presenter";
 

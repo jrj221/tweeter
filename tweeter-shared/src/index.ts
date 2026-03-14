@@ -20,6 +20,7 @@ export type { UserDTO } from "./model/dto/UserDTO";
 // Requests
 //
 export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequest";
+export type { TweeterRequest } from "./model/net/request/TweeterRequest";
 
 //
 // Responses

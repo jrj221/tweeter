@@ -1,4 +1,4 @@
-import { UserService } from "../model.service/UserService";
+import { UserService } from "../model/service/UserService";
 import { Buffer } from "buffer";
 import { AuthenticationView } from "./Presenter";
 import { AuthenticationPresenter } from "./AuthenticationPresenter";

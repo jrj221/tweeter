@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 import { PagedItemPresenter, PagedItemView } from "../../presenter/PagedItemPresenter";
-import { Service } from "../../model.service/Service";
+import { Service } from "../../model/service/Service";
 
 interface Props<T, U extends Service> {
 	featureURL: string;
