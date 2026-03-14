@@ -9,7 +9,6 @@ export class FollowService implements Service {
 		pageSize: number,
 		lastItem: User | null
 	): Promise<[User[], boolean]> {
-		// TODO: Replace with the result of calling server
 		const facade = new ServerFacade();
 		return facade.getMoreFollowees({token: authToken.token, userAlias:userAlias, pageSize: pageSize, lastItem: lastItem?.DTO ?? null});
 	}
@@ -20,8 +19,9 @@ export class FollowService implements Service {
 		pageSize: number,
 		lastItem: User | null
 	): Promise<[User[], boolean]> {
-		// TODO: Replace with the result of calling server
-		return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
+		const facade = new ServerFacade();
+		return facade.getMoreFollowers({token: authToken.token, userAlias:userAlias, pageSize: pageSize, lastItem: lastItem?.DTO ?? null});
+	
 	}
 
 	public async getIsFollowerStatus(authToken: AuthToken, user: User, selectedUser: User): Promise<boolean> {
