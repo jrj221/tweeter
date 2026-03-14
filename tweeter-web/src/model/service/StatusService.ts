@@ -10,7 +10,12 @@ export class StatusService implements Service {
 	): Promise<[Status[], boolean]> {
 		// TODO: Replace with the result of calling server
 		const facade = new ServerFacade();
-		return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+		return facade.getMoreFeedItems({
+			token: authToken.token,
+			userAlias: userAlias,
+			pageSize: pageSize,
+			lastItem: lastItem?.DTO ?? null,
+		});
 	}
 
 	public async loadMoreStoryItems(

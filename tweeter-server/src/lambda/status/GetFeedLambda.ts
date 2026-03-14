@@ -4,7 +4,7 @@ import { StatusService } from "../../model/service/StatusService";
 // This function gets called by API Gateway when you make a request
 export const handler = async (request: PagedStatusItemRequest): Promise<PagedStatusItemResponse> => {
 	const statusService = new StatusService();
-	const [items, hasMore] = await statusService.loadMoreStoryItems(
+	const [items, hasMore] = await statusService.loadMoreFeedItems(
 		request.token,
 		request.userAlias,
 		request.pageSize,

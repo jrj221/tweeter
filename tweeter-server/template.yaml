@@ -127,6 +127,19 @@ Resources:
                                 responses: *commonAmazonResponses
                             responses: *commonSwaggerResponses
 
+                    /follower/list:
+                        post:
+                            consumes: *commonConsumes
+                            produces: *commonProduces
+                            x-amazon-apigateway-integration:
+                                type: aws
+                                httpMethod: POST
+                                uri:
+                                    Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getFollowersFunction.Arn}/invocations
+                                requestTemplates: *commonRequestTemplates
+                                responses: *commonAmazonResponses
+                            responses: *commonSwaggerResponses
+
                     /story/list:
                         post:
                             consumes: *commonConsumes
@@ -136,6 +149,19 @@ Resources:
                                 httpMethod: POST
                                 uri:
                                     Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getStoriesFunction.Arn}/invocations
+                                requestTemplates: *commonRequestTemplates
+                                responses: *commonAmazonResponses
+                            responses: *commonSwaggerResponses
+
+                    /feed/list:
+                        post:
+                            consumes: *commonConsumes
+                            produces: *commonProduces
+                            x-amazon-apigateway-integration:
+                                type: aws
+                                httpMethod: POST
+                                uri:
+                                    Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getFeedFunction.Arn}/invocations
                                 requestTemplates: *commonRequestTemplates
                                 responses: *commonAmazonResponses
                             responses: *commonSwaggerResponses
@@ -200,6 +226,20 @@ Resources:
                         Path: /followee/list
                         Method: POST
 
+    getFollowersFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: getFollowersFunction
+            Handler: lambda/follow/GetFollowersLambda.handler
+            Policies: *commonPolicies
+            Events:
+                PostApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref tweeterApi
+                        Path: /follower/list
+                        Method: POST
+
     getStoriesFunction:
         Type: AWS::Serverless::Function
         Properties:
@@ -212,6 +252,20 @@ Resources:
                     Properties:
                         RestApiId: !Ref tweeterApi
                         Path: /story/list
+                        Method: POST
+
+    getFeedFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: getFeedFunction
+            Handler: lambda/status/GetFeedLambda.handler
+            Policies: *commonPolicies
+            Events:
+                PostApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref tweeterApi
+                        Path: /feed/list
                         Method: POST
 
     #
