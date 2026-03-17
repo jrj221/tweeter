@@ -6,7 +6,7 @@ export const handler = async (request: PagedStatusItemRequest): Promise<PagedSta
 	const statusService = new ServerStatusService();
 	const [items, hasMore] = await statusService.loadMoreFeedItems(
 		request.token,
-		request.userAlias,
+		request.alias,
 		request.pageSize,
 		request.lastItem,
 	);

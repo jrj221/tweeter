@@ -4,7 +4,7 @@ exports.handler = void 0;
 const ServerUserService_1 = require("../../model/service/ServerUserService");
 const handler = async (request) => {
     const userService = new ServerUserService_1.ServerUserService();
-    const userDTO = await userService.getUser(request.token, request.alias);
-    return { success: true, message: null, userDTO: userDTO };
+    const [user, token] = await userService.login(request.alias, request.password);
+    return { success: true, message: null, userDTO: user, token: token };
 };
 exports.handler = handler;

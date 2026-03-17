@@ -10,9 +10,9 @@ export class StatusService implements Service {
 	): Promise<[Status[], boolean]> {
 		// TODO: Replace with the result of calling server
 		const facade = new ServerFacade();
-		return facade.getMoreFeedItems({
+		return await facade.getMoreFeedItems({
 			token: authToken.token,
-			userAlias: userAlias,
+			alias: userAlias,
 			pageSize: pageSize,
 			lastItem: lastItem?.DTO ?? null,
 		});
@@ -25,9 +25,9 @@ export class StatusService implements Service {
 		lastItem: Status | null,
 	): Promise<[Status[], boolean]> {
 		const facade = new ServerFacade();
-		return facade.getMoreStoryItems({
+		return await facade.getMoreStoryItems({
 			token: authToken.token,
-			userAlias: userAlias,
+			alias: userAlias,
 			pageSize: pageSize,
 			lastItem: lastItem?.DTO ?? null,
 		});

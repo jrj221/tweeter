@@ -6,7 +6,7 @@ export const handler = async (request: PagedUserItemRequest): Promise<PagedUserI
 	const followService = new ServerFollowService();
 	const [items, hasMore] = await followService.loadMoreFollowees(
 		request.token,
-		request.userAlias,
+		request.alias,
 		request.pageSize,
 		request.lastItem,
 	);

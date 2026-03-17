@@ -8,7 +8,10 @@ import {
 	UserDTO,
 	StatusDTO,
 	GetUserRequest,
-	GetUserResponse, // Why import this?
+	GetUserResponse,
+	AuthToken,
+	LoginRequest,
+	LoginResponse, // Why import this?
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
@@ -65,12 +68,25 @@ export class ServerFacade {
 		const response = await this.clientCommunicator.doPost<GetUserRequest, GetUserResponse>(request, "/user/get");
 
 		if (response.success) {
-			const user = response.user;
+			const user = response.userDTO;
 			if (user == null) {
 				throw new Error(`User ${request.alias} not found`);
 			} else {
 				return User.fromDTO(user);
 			}
+		} else {
+			console.error(response);
+			throw new Error(response.message ?? undefined);
+		}
+	}
+
+	public async login(request: LoginRequest): Promise<[User, AuthToken]> {
+		const response = await this.clientCommunicator.doPost<LoginRequest, LoginResponse>(request, "/user/login");
+
+		if (response.success) {
+			const user = User.fromDTO(response.userDTO);
+			const authToken = new AuthToken(response.token, Date.now());
+			return [user!, authToken]; // Any way to ensure this ALWAYS returns a user?
 		} else {
 			console.error(response);
 			throw new Error(response.message ?? undefined);

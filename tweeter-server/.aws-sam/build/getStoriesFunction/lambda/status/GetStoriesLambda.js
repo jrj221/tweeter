@@ -5,7 +5,7 @@ const ServerStatusService_1 = require("../../model/service/ServerStatusService")
 // This function gets called by API Gateway when you make a request
 const handler = async (request) => {
     const statusService = new ServerStatusService_1.ServerStatusService();
-    const [items, hasMore] = await statusService.loadMoreStoryItems(request.token, request.userAlias, request.pageSize, request.lastItem);
+    const [items, hasMore] = await statusService.loadMoreStoryItems(request.token, request.alias, request.pageSize, request.lastItem);
     return { success: true, message: null, items: items, hasMoreItems: hasMore };
 };
 exports.handler = handler;

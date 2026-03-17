@@ -24,6 +24,7 @@ export type { PagedStatusItemRequest } from "./model/net/request/PagedStatusItem
 export type { PagedItemRequest } from "./model/net/request/PagedItemRequest";
 export type { TweeterRequest } from "./model/net/request/TweeterRequest";
 export type { GetUserRequest } from "./model/net/request/GetUserRequest";
+export type { LoginRequest } from "./model/net/request/LoginRequest";
 
 //
 // Responses
@@ -33,6 +34,7 @@ export type { PagedStatusItemResponse } from "./model/net/response/PagedStatusIt
 export type { PagedItemResponse } from "./model/net/response/PagedItemResponse";
 export type { TweeterResponse } from "./model/net/response/TweeterResponse";
 export type { GetUserResponse } from "./model/net/response/GetUserResponse";
+export type { LoginResponse } from "./model/net/response/LoginResponse";
 
 //
 // Other

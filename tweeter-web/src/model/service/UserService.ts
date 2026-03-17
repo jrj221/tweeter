@@ -17,7 +17,8 @@ export class UserService implements Service {
 
 	public async login(alias: string, password: string): Promise<[User, AuthToken]> {
 		// TODO: Replace with the result of calling the server
-		return this.returnUser();
+		const facade = new ServerFacade();
+		return await facade.login({ alias: alias, password: password });
 	}
 
 	public async register(

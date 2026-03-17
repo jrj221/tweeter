@@ -7,21 +7,30 @@ export class FollowService implements Service {
 		authToken: AuthToken,
 		userAlias: string,
 		pageSize: number,
-		lastItem: User | null
+		lastItem: User | null,
 	): Promise<[User[], boolean]> {
 		const facade = new ServerFacade();
-		return facade.getMoreFollowees({token: authToken.token, userAlias:userAlias, pageSize: pageSize, lastItem: lastItem?.DTO ?? null});
+		return await facade.getMoreFollowees({
+			token: authToken.token,
+			alias: userAlias,
+			pageSize: pageSize,
+			lastItem: lastItem?.DTO ?? null,
+		});
 	}
 
 	public async loadMoreFollowers(
 		authToken: AuthToken,
 		userAlias: string,
 		pageSize: number,
-		lastItem: User | null
+		lastItem: User | null,
 	): Promise<[User[], boolean]> {
 		const facade = new ServerFacade();
-		return facade.getMoreFollowers({token: authToken.token, userAlias:userAlias, pageSize: pageSize, lastItem: lastItem?.DTO ?? null});
-	
+		return await facade.getMoreFollowers({
+			token: authToken.token,
+			alias: userAlias,
+			pageSize: pageSize,
+			lastItem: lastItem?.DTO ?? null,
+		});
 	}
 
 	public async getIsFollowerStatus(authToken: AuthToken, user: User, selectedUser: User): Promise<boolean> {
@@ -41,7 +50,7 @@ export class FollowService implements Service {
 
 	public async changeFollowingStatus(
 		authToken: AuthToken,
-		userToChangeFollowingStatusFor: User
+		userToChangeFollowingStatusFor: User,
 	): Promise<[followerCount: number, followeeCount: number]> {
 		// Pause so we can see the follow message. Remove when connected to the server
 		await new Promise((f) => setTimeout(f, 2000));
@@ -56,14 +65,14 @@ export class FollowService implements Service {
 
 	public follow = async (
 		authToken: AuthToken,
-		userToFollow: User
+		userToFollow: User,
 	): Promise<[followerCount: number, followeeCount: number]> => {
 		return await this.changeFollowingStatus(authToken, userToFollow);
 	};
 
 	public unfollow = async (
 		authToken: AuthToken,
-		userToUnfollow: User
+		userToUnfollow: User,
 	): Promise<[followerCount: number, followeeCount: number]> => {
 		return await this.changeFollowingStatus(authToken, userToUnfollow);
 	};

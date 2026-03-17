@@ -18,6 +18,7 @@ class ServerUserService {
         return this.returnUser();
     }
     async register(firstName, lastName, alias, password, userImageBytes, imageFileExtension) {
+        // FYI, I changed return value when doing login
         // Not neded now, but will be needed when you make the request to the server in milestone 3
         const imageStringBase64 = buffer_1.Buffer.from(userImageBytes).toString("base64");
         // TODO: Replace with the result of calling the server
@@ -28,7 +29,7 @@ class ServerUserService {
         if (user === null) {
             throw new Error("Invalid registration");
         }
-        return [user, tweeter_shared_1.FakeData.instance.authToken]; // TS interprets it as an array instead of tuple without this cast idk why
+        return [user.DTO, tweeter_shared_1.FakeData.instance.authToken.token]; // TS interprets it as an array instead of tuple without this cast idk why
     }
 }
 exports.ServerUserService = ServerUserService;

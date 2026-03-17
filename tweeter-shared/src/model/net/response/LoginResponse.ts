@@ -1,6 +1,7 @@
 import { UserDTO } from "../../dto/UserDTO";
 import { TweeterResponse } from "./TweeterResponse";
 
-export interface GetUserResponse extends TweeterResponse {
-	userDTO: UserDTO | null;
+export interface LoginResponse extends TweeterResponse {
+	userDTO: UserDTO;
+	token: string;
 }
