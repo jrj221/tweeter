@@ -41,14 +41,4 @@ export class UserService implements Service {
 			imageFileExtension: imageFileExtension,
 		});
 	}
-
-	private async returnUser() {
-		const user = FakeData.instance.firstUser;
-
-		if (user === null) {
-			throw new Error("Invalid registration");
-		}
-
-		return [user, FakeData.instance.authToken] as [User, AuthToken]; // TS interprets it as an array instead of tuple without this cast idk why
-	}
 }
