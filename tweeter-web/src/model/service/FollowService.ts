@@ -34,8 +34,12 @@ export class FollowService implements Service {
 	}
 
 	public async getIsFollowerStatus(authToken: AuthToken, user: User, selectedUser: User): Promise<boolean> {
-		// TODO: Replace with the result of calling server
-		return FakeData.instance.isFollower();
+		const facade = new ServerFacade();
+		return await facade.getIsFollowerStatus({
+			token: authToken.token,
+			user: user.DTO,
+			selectedUser: selectedUser.DTO,
+		});
 	}
 
 	public async getFolloweeCount(authToken: AuthToken, user: User): Promise<number> {

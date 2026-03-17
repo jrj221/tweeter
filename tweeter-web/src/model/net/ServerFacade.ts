@@ -14,6 +14,8 @@ import {
 	LoginResponse,
 	RegisterRequest,
 	RegisterResponse,
+	IsFollowerRequest,
+	IsFollowerResponse,
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
@@ -105,6 +107,20 @@ export class ServerFacade {
 			const user = User.fromDTO(response.userDTO);
 			const authToken = new AuthToken(response.token, Date.now());
 			return [user!, authToken];
+		} else {
+			console.error(response);
+			throw new Error(response.message ?? undefined);
+		}
+	}
+
+	public async getIsFollowerStatus(request: IsFollowerRequest): Promise<boolean> {
+		const response = await this.clientCommunicator.doPost<IsFollowerRequest, IsFollowerResponse>(
+			request,
+			"/follow/isFollower",
+		);
+
+		if (response.success) {
+			return response.isFollower;
 		} else {
 			console.error(response);
 			throw new Error(response.message ?? undefined);
