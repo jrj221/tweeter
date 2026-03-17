@@ -15,7 +15,6 @@ export class ServerUserService implements Service {
 	}
 
 	public async login(alias: string, password: string): Promise<[UserDTO, string]> {
-		// TODO: Replace with the result of calling the server
 		return this.returnUser();
 	}
 
@@ -27,11 +26,7 @@ export class ServerUserService implements Service {
 		userImageBytes: Uint8Array,
 		imageFileExtension: string,
 	): Promise<[UserDTO, string]> {
-		// FYI, I changed return value when doing login
-		// Not neded now, but will be needed when you make the request to the server in milestone 3
 		const imageStringBase64: string = Buffer.from(userImageBytes).toString("base64");
-
-		// TODO: Replace with the result of calling the server
 		return this.returnUser();
 	}
 

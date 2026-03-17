@@ -192,6 +192,19 @@ Resources:
                                 responses: *commonAmazonResponses
                             responses: *commonSwaggerResponses
 
+                    /user/register:
+                        post:
+                            consumes: *commonConsumes
+                            produces: *commonProduces
+                            x-amazon-apigateway-integration:
+                                type: aws
+                                httpMethod: POST
+                                uri:
+                                    Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${registerUserFunction.Arn}/invocations
+                                requestTemplates: *commonRequestTemplates
+                                responses: *commonAmazonResponses
+                            responses: *commonSwaggerResponses
+
     #
     # SQS Queues  (This will become relevant in Milestone 4. For M3, leave this section commented out.)
     #
@@ -320,6 +333,20 @@ Resources:
                     Properties:
                         RestApiId: !Ref tweeterApi
                         Path: /user/login
+                        Method: POST
+
+    registerUserFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: registerUserFunction
+            Handler: lambda/user/RegisterLambda.handler
+            Policies: *commonPolicies
+            Events:
+                PostApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref tweeterApi
+                        Path: /user/register
                         Method: POST
 
     #

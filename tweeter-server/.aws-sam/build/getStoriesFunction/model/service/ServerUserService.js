@@ -14,14 +14,10 @@ class ServerUserService {
         await new Promise((res) => setTimeout(res, 1000));
     }
     async login(alias, password) {
-        // TODO: Replace with the result of calling the server
         return this.returnUser();
     }
     async register(firstName, lastName, alias, password, userImageBytes, imageFileExtension) {
-        // FYI, I changed return value when doing login
-        // Not neded now, but will be needed when you make the request to the server in milestone 3
         const imageStringBase64 = buffer_1.Buffer.from(userImageBytes).toString("base64");
-        // TODO: Replace with the result of calling the server
         return this.returnUser();
     }
     async returnUser() {
