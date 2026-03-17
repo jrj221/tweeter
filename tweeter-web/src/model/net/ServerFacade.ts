@@ -18,6 +18,8 @@ import {
 	IsFollowerResponse,
 	PostStatusRequest,
 	PostStatusResponse,
+	LogoutRequest,
+	LogoutResponse,
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
@@ -133,6 +135,18 @@ export class ServerFacade {
 		const response = await this.clientCommunicator.doPost<PostStatusRequest, PostStatusResponse>(
 			request,
 			"/status/post",
+		);
+
+		if (!response.success) {
+			console.error(response);
+			throw new Error(response.message ?? undefined);
+		}
+	}
+
+	public async logout(request: LogoutRequest): Promise<void> {
+		const response = await this.clientCommunicator.doPost<LogoutRequest, LogoutResponse>(
+			request,
+			"/user/logout",
 		);
 
 		if (!response.success) {
