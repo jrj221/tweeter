@@ -1,7 +1,7 @@
 import { AuthToken } from "tweeter-shared";
 import { AppNavbarView, AppNavbarPresenter } from "../../src/presenter/AppNavbarPresenter";
 import { mock, instance, verify, anything, spy, when, capture } from "@typestrong/ts-mockito";
-import { UserService } from "../../src/model.service/UserService";
+import { UserService } from "../../src/model/service/UserService";
 
 // When you stub or verify you have to use the mock or spy.
 // When you call methods you use instances
@@ -57,8 +57,8 @@ describe("AppNavbarPresenter", () => {
 		await appNavbarPresenter.logOut(authToken);
 		verify(
 			mockAppNavbarPresenterView.displayErrorMessage(
-				"Failed to log user out because of exception: An error occurred"
-			)
+				"Failed to log user out because of exception: An error occurred",
+			),
 		).once();
 		verify(mockAppNavbarPresenterView.deleteMessage(anything())).never();
 		verify(mockAppNavbarPresenterView.clearUserInfo()).never();

@@ -1,7 +1,7 @@
 import { AuthToken, Status, User } from "tweeter-shared";
 import { PostStatusPresenter, PostStatusView } from "../../src/presenter/PostStatusPresenter";
 import { mock, instance, spy, when, verify, anything, capture } from "@typestrong/ts-mockito";
-import { StatusService } from "../../src/model.service/StatusService";
+import { StatusService } from "../../src/model/service/StatusService";
 
 describe("PostStatusPresenter", () => {
 	let mockPostStatusPresenterView: PostStatusView;
@@ -58,8 +58,8 @@ describe("PostStatusPresenter", () => {
 		verify(mockPostStatusPresenterView.deleteMessage("postID123")).once(); // Clears previous info message
 		verify(
 			mockPostStatusPresenterView.displayErrorMessage(
-				"Failed to post the status because of exception: An error occurred"
-			)
+				"Failed to post the status because of exception: An error occurred",
+			),
 		).once(); // Displays an error message
 		verify(mockPostStatusPresenterView.setPost("")).never(); // Does not clear the post
 		verify(mockPostStatusPresenterView.displayInfoMessage("Status posted!", 2000)).never(); // Does not display "Status posted" message
