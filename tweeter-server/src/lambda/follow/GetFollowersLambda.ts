@@ -1,9 +1,9 @@
 import { PagedUserItemRequest, PagedUserItemResponse } from "tweeter-shared";
-import { FollowService } from "../../model/service/ServerFollowService";
+import { ServerFollowService } from "../../model/service/ServerFollowService";
 
 // This function gets called by API Gateway when you make a request
 export const handler = async (request: PagedUserItemRequest): Promise<PagedUserItemResponse> => {
-	const followService = new FollowService();
+	const followService = new ServerFollowService();
 	const [items, hasMore] = await followService.loadMoreFollowers(
 		request.token,
 		request.userAlias,

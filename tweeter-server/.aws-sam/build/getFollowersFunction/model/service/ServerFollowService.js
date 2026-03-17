@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FollowService = void 0;
+exports.ServerFollowService = void 0;
 const tweeter_shared_1 = require("tweeter-shared");
-class FollowService {
+class ServerFollowService {
     async loadMoreFollowees(token, userAlias, pageSize, lastItem) {
         // TODO: Replace with the result of calling server
         return this.getFakeData(lastItem, pageSize, userAlias);
@@ -43,4 +43,4 @@ class FollowService {
         return await this.changeFollowingStatus(authToken, userToUnfollow);
     };
 }
-exports.FollowService = FollowService;
+exports.ServerFollowService = ServerFollowService;

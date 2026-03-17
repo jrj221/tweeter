@@ -6,7 +6,9 @@ import {
 	Status,
 	User,
 	UserDTO,
-	StatusDTO, // Why import this?
+	StatusDTO,
+	GetUserRequest,
+	GetUserResponse, // Why import this?
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
@@ -57,5 +59,21 @@ export class ServerFacade {
 
 	public async getMoreFeedItems(request: PagedStatusItemRequest): Promise<[Status[], boolean]> {
 		return this.getMoreItems<StatusDTO, Status>(request, "/feed/list", "feed items", Status);
+	}
+
+	public async getUser(request: GetUserRequest): Promise<User | null> {
+		const response = await this.clientCommunicator.doPost<GetUserRequest, GetUserResponse>(request, "/user/get");
+
+		if (response.success) {
+			const user = response.user;
+			if (user == null) {
+				throw new Error(`User ${request.alias} not found`);
+			} else {
+				return User.fromDTO(user);
+			}
+		} else {
+			console.error(response);
+			throw new Error(response.message ?? undefined);
+		}
 	}
 }
