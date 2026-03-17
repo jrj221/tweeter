@@ -20,6 +20,8 @@ import {
 	PostStatusResponse,
 	LogoutRequest,
 	LogoutResponse,
+	GetCountRequest,
+	GetCountResponse,
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
@@ -153,5 +155,27 @@ export class ServerFacade {
 			console.error(response);
 			throw new Error(response.message ?? undefined);
 		}
+	}
+
+	public async getCount(request: GetCountRequest, endpoint: string): Promise<number> {
+		const response = await this.clientCommunicator.doPost<GetCountRequest, GetCountResponse>(
+			request,
+			endpoint,
+		);
+
+		if (response.success) {
+			return response.count;
+		} else {
+			console.error(response);
+			throw new Error(response.message ?? undefined);
+		}
+	}
+
+	public async getFollowerCount(request: GetCountRequest): Promise<number> {
+		return this.getCount(request, "/follow/followers/count");
+	}
+
+	public async getFolloweeCount(request: GetCountRequest): Promise<number> {
+		return this.getCount(request, "/follow/followees/count");
 	}
 }

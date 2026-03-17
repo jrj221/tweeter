@@ -20,27 +20,27 @@ class ServerFollowService {
         // TODO: Replace with the result of calling server
         return tweeter_shared_1.FakeData.instance.isFollower();
     }
-    async getFolloweeCount(authToken, user) {
+    async getFolloweeCount(token, user) {
         // TODO: Replace with the result of calling server
         return tweeter_shared_1.FakeData.instance.getFolloweeCount(user.alias);
     }
-    async getFollowerCount(authToken, user) {
+    async getFollowerCount(token, user) {
         // TODO: Replace with the result of calling server
         return tweeter_shared_1.FakeData.instance.getFollowerCount(user.alias);
     }
-    async changeFollowingStatus(authToken, userToChangeFollowingStatusFor) {
+    async changeFollowingStatus(token, userToChangeFollowingStatusFor) {
         // Pause so we can see the follow message. Remove when connected to the server
         await new Promise((f) => setTimeout(f, 2000));
         // TODO: Call the server
-        const followerCount = await this.getFollowerCount(authToken, userToChangeFollowingStatusFor);
-        const followeeCount = await this.getFolloweeCount(authToken, userToChangeFollowingStatusFor);
+        const followerCount = await this.getFollowerCount(token, userToChangeFollowingStatusFor);
+        const followeeCount = await this.getFolloweeCount(token, userToChangeFollowingStatusFor);
         return [followerCount, followeeCount];
     }
-    follow = async (authToken, userToFollow) => {
-        return await this.changeFollowingStatus(authToken, userToFollow);
+    follow = async (token, userToFollow) => {
+        return await this.changeFollowingStatus(token, userToFollow);
     };
-    unfollow = async (authToken, userToUnfollow) => {
-        return await this.changeFollowingStatus(authToken, userToUnfollow);
+    unfollow = async (token, userToUnfollow) => {
+        return await this.changeFollowingStatus(token, userToUnfollow);
     };
 }
 exports.ServerFollowService = ServerFollowService;
