@@ -1,4 +1,4 @@
-import { PagedUserItemRequest, RegisterRequest, User } from "tweeter-shared";
+import { GetCountRequest, PagedUserItemRequest, RegisterRequest, User } from "tweeter-shared";
 import "isomorphic-fetch";
 import { ServerFacade } from "../../../src/model/net/ServerFacade";
 
@@ -57,5 +57,20 @@ describe("ServerFacade", () => {
 		expect(followers).toEqual(expectedFollowers);
 	});
 
-	it("gets the number of followers for a user", async () => {});
+	it("gets the number of followers for a user", async () => {
+		const request: GetCountRequest = {
+			token: "",
+			user: {
+				firstName: "Allen",
+				lastName: "Anderson",
+				alias: "@allen",
+				imageURL: "https://faculty.cs.byu.edu/~jwilkerson/cs340/tweeter/images/donald_duck.png",
+			},
+		};
+
+		const count = await facade.getFollowerCount(request);
+
+		expect(count).toBeTruthy();
+		expect(count).toBeGreaterThan(0);
+	});
 });
