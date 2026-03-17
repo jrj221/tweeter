@@ -328,6 +328,126 @@ Resources:
                   headers:
                     Access-Control-Allow-Origin:
                       type: string
+          /follow/followUser:
+            post:
+              consumes:
+              - application/json
+              produces:
+              - application/json
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${followUserFunction.Arn}/invocations
+                requestTemplates:
+                  application/json: $input.json('$')
+                responses:
+                  default:
+                    statusCode: 200
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: '''*'''
+                  .*bad-request.*:
+                    statusCode: 400
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: '''*'''
+                    responseTemplates:
+                      application/json: '{ "error": "$input.path(''$.errorMessage'')"
+                        }'
+                  .*unauthorized.*:
+                    statusCode: 401
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: '''*'''
+                    responseTemplates:
+                      application/json: '{ "error": "$input.path(''$.errorMessage'')"
+                        }'
+                  .*internal-server-error.*:
+                    statusCode: 500
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: '''*'''
+                    responseTemplates:
+                      application/json: '{ "error": "$input.path(''$.errorMessage'')"
+                        }'
+              responses:
+                '200':
+                  description: OK
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                '400':
+                  description: Bad Request
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                '401':
+                  description: Unauthorized
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                '500':
+                  description: Internal Server Error
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+          /follow/unfollowUser:
+            post:
+              consumes:
+              - application/json
+              produces:
+              - application/json
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${unfollowUserFunction.Arn}/invocations
+                requestTemplates:
+                  application/json: $input.json('$')
+                responses:
+                  default:
+                    statusCode: 200
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: '''*'''
+                  .*bad-request.*:
+                    statusCode: 400
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: '''*'''
+                    responseTemplates:
+                      application/json: '{ "error": "$input.path(''$.errorMessage'')"
+                        }'
+                  .*unauthorized.*:
+                    statusCode: 401
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: '''*'''
+                    responseTemplates:
+                      application/json: '{ "error": "$input.path(''$.errorMessage'')"
+                        }'
+                  .*internal-server-error.*:
+                    statusCode: 500
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: '''*'''
+                    responseTemplates:
+                      application/json: '{ "error": "$input.path(''$.errorMessage'')"
+                        }'
+              responses:
+                '200':
+                  description: OK
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                '400':
+                  description: Bad Request
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                '401':
+                  description: Unauthorized
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                '500':
+                  description: Internal Server Error
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
           /follower/list:
             post:
               consumes:
@@ -909,6 +1029,52 @@ Resources:
       CodeUri: getFolloweeCountFunction
     Metadata:
       SamResourceId: getFolloweeCountFunction
+  followUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: followUserFunction
+      Handler: lambda/follow/FollowUserLambda.handler
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - AmazonSESFullAccess
+      - CloudWatchFullAccess
+      - AmazonDynamoDBFullAccess
+      - AmazonS3FullAccess
+      - AmazonSQSFullAccess
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: tweeterApi
+            Path: /follow/followUser
+            Method: POST
+      CodeUri: followUserFunction
+    Metadata:
+      SamResourceId: followUserFunction
+  unfollowUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: unfollowUserFunction
+      Handler: lambda/follow/UnfollowUserLambda.handler
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - AmazonSESFullAccess
+      - CloudWatchFullAccess
+      - AmazonDynamoDBFullAccess
+      - AmazonS3FullAccess
+      - AmazonSQSFullAccess
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: tweeterApi
+            Path: /follow/unfollowUser
+            Method: POST
+      CodeUri: unfollowUserFunction
+    Metadata:
+      SamResourceId: unfollowUserFunction
   getFollowersFunction:
     Type: AWS::Serverless::Function
     Properties:

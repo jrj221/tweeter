@@ -7,6 +7,6 @@ architecture = "x86_64"
 handler = "lambda/follow/GetFolloweesLambda.handler"
 manifest_hash = ""
 packagetype = "Zip"
-functions = ["getFolloweesFunction", "getIsFollowerFunction", "getFollowerCountFunction", "getFolloweeCountFunction", "getFollowersFunction", "getStoriesFunction", "postStatusFunction", "getFeedFunction", "getUserFunction", "loginUserFunction", "registerUserFunction", "logoutUserFunction"]
+functions = ["getFolloweesFunction", "getIsFollowerFunction", "getFollowerCountFunction", "getFolloweeCountFunction", "followUserFunction", "unfollowUserFunction", "getFollowersFunction", "getStoriesFunction", "postStatusFunction", "getFeedFunction", "getUserFunction", "loginUserFunction", "registerUserFunction", "logoutUserFunction"]
 
 [layer_build_definitions]

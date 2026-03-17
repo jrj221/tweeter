@@ -22,6 +22,8 @@ import {
 	LogoutResponse,
 	GetCountRequest,
 	GetCountResponse,
+	FollowActionRequest,
+	FollowActionResponse,
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
@@ -177,5 +179,30 @@ export class ServerFacade {
 
 	public async getFolloweeCount(request: GetCountRequest): Promise<number> {
 		return this.getCount(request, "/follow/followees/count");
+	}
+
+	public async doFollowAction(
+		request: FollowActionRequest,
+		endpoint: string,
+	): Promise<[followerCount: number, followeeCount: number]> {
+		const response = await this.clientCommunicator.doPost<FollowActionRequest, FollowActionResponse>(
+			request,
+			endpoint,
+		);
+
+		if (response.success) {
+			return [response.followerCount, response.followeeCount];
+		} else {
+			console.error(response);
+			throw new Error(response.message ?? undefined);
+		}
+	}
+
+	public async followUser(request: FollowActionRequest): Promise<[followerCount: number, followeeCount: number]> {
+		return this.doFollowAction(request, "/follow/followUser");
+	}
+
+	public async unfollowUser(request: FollowActionRequest): Promise<[followerCount: number, followeeCount: number]> {
+		return this.doFollowAction(request, "/follow/unfollowUser");
 	}
 }

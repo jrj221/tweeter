@@ -166,6 +166,32 @@ Resources:
                                 responses: *commonAmazonResponses
                             responses: *commonSwaggerResponses
 
+                    /follow/followUser:
+                        post:
+                            consumes: *commonConsumes
+                            produces: *commonProduces
+                            x-amazon-apigateway-integration:
+                                type: aws
+                                httpMethod: POST
+                                uri:
+                                    Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${followUserFunction.Arn}/invocations
+                                requestTemplates: *commonRequestTemplates
+                                responses: *commonAmazonResponses
+                            responses: *commonSwaggerResponses
+
+                    /follow/unfollowUser:
+                        post:
+                            consumes: *commonConsumes
+                            produces: *commonProduces
+                            x-amazon-apigateway-integration:
+                                type: aws
+                                httpMethod: POST
+                                uri:
+                                    Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${unfollowUserFunction.Arn}/invocations
+                                requestTemplates: *commonRequestTemplates
+                                responses: *commonAmazonResponses
+                            responses: *commonSwaggerResponses
+
                     /follower/list:
                         post:
                             consumes: *commonConsumes
@@ -370,6 +396,34 @@ Resources:
                     Properties:
                         RestApiId: !Ref tweeterApi
                         Path: /follow/followees/count
+                        Method: POST
+
+    followUserFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: followUserFunction
+            Handler: lambda/follow/FollowUserLambda.handler
+            Policies: *commonPolicies
+            Events:
+                PostApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref tweeterApi
+                        Path: /follow/followUser
+                        Method: POST
+
+    unfollowUserFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: unfollowUserFunction
+            Handler: lambda/follow/UnfollowUserLambda.handler
+            Policies: *commonPolicies
+            Events:
+                PostApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref tweeterApi
+                        Path: /follow/unfollowUser
                         Method: POST
 
     getFollowersFunction:
