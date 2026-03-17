@@ -1,13 +1,9 @@
 import {
 	PagedStatusItemRequest,
-	PagedStatusItemResponse,
 	PagedUserItemRequest,
-	PagedUserItemResponse,
 	PagedItemRequest,
 	PagedItemResponse,
 	Status,
-	TweeterRequest,
-	TweeterResponse,
 	User,
 	UserDTO,
 	StatusDTO, // Why import this?

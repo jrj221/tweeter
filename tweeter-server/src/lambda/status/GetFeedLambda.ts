@@ -1,5 +1,5 @@
 import { PagedStatusItemRequest, PagedStatusItemResponse } from "tweeter-shared";
-import { StatusService } from "../../model/service/StatusService";
+import { StatusService } from "../../model/service/ServerStatusService";
 
 // This function gets called by API Gateway when you make a request
 export const handler = async (request: PagedStatusItemRequest): Promise<PagedStatusItemResponse> => {
