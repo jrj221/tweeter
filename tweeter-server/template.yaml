@@ -48,7 +48,7 @@ Resources:
             Name: tweeterApi
             StageName: prod
             Cors:
-                AllowMethods: "'GET,POST,PUT,DELETE'"
+                AllowMethods: "'GET,POST,PUT,DELETE, OPTIONS'"
                 AllowHeaders: "'*'"
                 AllowOrigin: "'*'"
             DefinitionBody:
@@ -123,6 +123,19 @@ Resources:
                                 httpMethod: POST
                                 uri:
                                     Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getFolloweesFunction.Arn}/invocations
+                                requestTemplates: *commonRequestTemplates
+                                responses: *commonAmazonResponses
+                            responses: *commonSwaggerResponses
+
+                    /follow/isFollower:
+                        post:
+                            consumes: *commonConsumes
+                            produces: *commonProduces
+                            x-amazon-apigateway-integration:
+                                type: aws
+                                httpMethod: POST
+                                uri:
+                                    Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getIsFollowerFunction.Arn}/invocations
                                 requestTemplates: *commonRequestTemplates
                                 responses: *commonAmazonResponses
                             responses: *commonSwaggerResponses
@@ -263,6 +276,20 @@ Resources:
                     Properties:
                         RestApiId: !Ref tweeterApi
                         Path: /followee/list
+                        Method: POST
+
+    getIsFollowerFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: getIsFollowerFunction
+            Handler: lambda/follow/GetIsFollowerLambda.handler
+            Policies: *commonPolicies
+            Events:
+                PostApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref tweeterApi
+                        Path: /follow/isFollower
                         Method: POST
 
     getFollowersFunction:
