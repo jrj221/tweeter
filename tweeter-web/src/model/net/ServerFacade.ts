@@ -16,6 +16,8 @@ import {
 	RegisterResponse,
 	IsFollowerRequest,
 	IsFollowerResponse,
+	PostStatusRequest,
+	PostStatusResponse,
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
@@ -122,6 +124,18 @@ export class ServerFacade {
 		if (response.success) {
 			return response.isFollower;
 		} else {
+			console.error(response);
+			throw new Error(response.message ?? undefined);
+		}
+	}
+
+	public async postStatus(request: PostStatusRequest): Promise<void> {
+		const response = await this.clientCommunicator.doPost<PostStatusRequest, PostStatusResponse>(
+			request,
+			"/status/post",
+		);
+
+		if (!response.success) {
 			console.error(response);
 			throw new Error(response.message ?? undefined);
 		}
