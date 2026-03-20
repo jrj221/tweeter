@@ -4,14 +4,13 @@ import { Service } from "./Service";
 
 export class ServerUserService implements Service {
 	public async getUser(token: string, alias: string): Promise<UserDTO | null> {
-		// TODO: Replace with the result of calling server
 		const user: User | null = FakeData.instance.findUserByAlias(alias);
 		return user?.DTO ?? null;
 	}
 
 	public async logout(token: string): Promise<void> {
 		// Pause so we can see the logging out message. Delete when the call to the server is implemented.
-		await new Promise((res) => setTimeout(res, 1000));
+		// await new Promise((res) => setTimeout(res, 1000));
 	}
 
 	public async login(alias: string, password: string): Promise<[UserDTO, string]> {

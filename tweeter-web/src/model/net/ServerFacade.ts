@@ -61,19 +61,19 @@ export class ServerFacade {
 	}
 
 	public async getMoreFollowees(request: PagedUserItemRequest): Promise<[User[], boolean]> {
-		return this.getMoreItems<UserDTO, User>(request, "/followee/list", "followees", User);
+		return this.getMoreItems<UserDTO, User>(request, "/follow/followees/list", "followees", User);
 	}
 
 	public async getMoreFollowers(request: PagedUserItemRequest): Promise<[User[], boolean]> {
-		return this.getMoreItems<UserDTO, User>(request, "/follower/list", "followers", User);
+		return this.getMoreItems<UserDTO, User>(request, "/follow/followers/list", "followers", User);
 	}
 
 	public async getMoreStoryItems(request: PagedStatusItemRequest): Promise<[Status[], boolean]> {
-		return this.getMoreItems<StatusDTO, Status>(request, "/story/list", "story items", Status);
+		return this.getMoreItems<StatusDTO, Status>(request, "/status/story/list", "story items", Status);
 	}
 
 	public async getMoreFeedItems(request: PagedStatusItemRequest): Promise<[Status[], boolean]> {
-		return this.getMoreItems<StatusDTO, Status>(request, "/feed/list", "feed items", Status);
+		return this.getMoreItems<StatusDTO, Status>(request, "/status/feed/list", "feed items", Status);
 	}
 
 	public async getUser(request: GetUserRequest): Promise<User | null> {
@@ -148,10 +148,7 @@ export class ServerFacade {
 	}
 
 	public async logout(request: LogoutRequest): Promise<void> {
-		const response = await this.clientCommunicator.doPost<LogoutRequest, LogoutResponse>(
-			request,
-			"/user/logout",
-		);
+		const response = await this.clientCommunicator.doPost<LogoutRequest, LogoutResponse>(request, "/user/logout");
 
 		if (!response.success) {
 			console.error(response);
@@ -160,10 +157,7 @@ export class ServerFacade {
 	}
 
 	public async getCount(request: GetCountRequest, endpoint: string): Promise<number> {
-		const response = await this.clientCommunicator.doPost<GetCountRequest, GetCountResponse>(
-			request,
-			endpoint,
-		);
+		const response = await this.clientCommunicator.doPost<GetCountRequest, GetCountResponse>(request, endpoint);
 
 		if (response.success) {
 			return response.count;

@@ -88,7 +88,7 @@ Resources:
               Access-Control-Allow-Origin:
                 type: string
         paths:
-          /followee/list:
+          /follow/followees/list:
             post:
               consumes:
               - application/json
@@ -448,7 +448,7 @@ Resources:
                   headers:
                     Access-Control-Allow-Origin:
                       type: string
-          /follower/list:
+          /follow/followers/list:
             post:
               consumes:
               - application/json
@@ -508,7 +508,7 @@ Resources:
                   headers:
                     Access-Control-Allow-Origin:
                       type: string
-          /story/list:
+          /status/story/list:
             post:
               consumes:
               - application/json
@@ -628,7 +628,7 @@ Resources:
                   headers:
                     Access-Control-Allow-Origin:
                       type: string
-          /feed/list:
+          /status/feed/list:
             post:
               consumes:
               - application/json
@@ -955,7 +955,7 @@ Resources:
           Properties:
             RestApiId:
               Ref: tweeterApi
-            Path: /followee/list
+            Path: /follow/followees/list
             Method: POST
       CodeUri: getFolloweesFunction
     Metadata:
@@ -1093,7 +1093,7 @@ Resources:
           Properties:
             RestApiId:
               Ref: tweeterApi
-            Path: /follower/list
+            Path: /follow/followers/list
             Method: POST
       CodeUri: getFollowersFunction
     Metadata:
@@ -1116,7 +1116,7 @@ Resources:
           Properties:
             RestApiId:
               Ref: tweeterApi
-            Path: /story/list
+            Path: /status/story/list
             Method: POST
       CodeUri: getStoriesFunction
     Metadata:
@@ -1162,7 +1162,7 @@ Resources:
           Properties:
             RestApiId:
               Ref: tweeterApi
-            Path: /feed/list
+            Path: /status/feed/list
             Method: POST
       CodeUri: getFeedFunction
     Metadata:
