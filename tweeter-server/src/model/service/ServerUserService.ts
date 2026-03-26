@@ -4,18 +4,21 @@ import { Service } from "./Service";
 
 export class ServerUserService extends Service {
 	public async getUser(token: string, alias: string): Promise<UserDTO | null> {
+		this.checkParams(token, alias);
 		await this.doAuthenticate(token);
 		const userDAO = this._daoFactory.makeUserDAO();
 		return await userDAO.findUserByAlias(alias);
 	}
 
 	public async logout(token: string): Promise<void> {
+		this.checkParams(token);
 		await this.doAuthenticate(token);
 		const authTokenDAO = this._daoFactory.makeAuthTokenDAO();
 		await authTokenDAO.removeAuthToken(token);
 	}
 
 	public async login(alias: string, password: string): Promise<[UserDTO, string]> {
+		this.checkParams(alias, password);
 		const userDAO = this._daoFactory.makeUserDAO();
 		const user = await userDAO.findUserByAlias(alias);
 
@@ -38,6 +41,7 @@ export class ServerUserService extends Service {
 		userImageBytes: Uint8Array,
 		imageFileExtension: string,
 	): Promise<[UserDTO, string]> {
+		this.checkParams(firstName, lastName, alias, password, userImageBytes, imageFileExtension);
 		const userDAO = this._daoFactory.makeUserDAO();
 		
 		// In a real app, we would upload the image to S3 here and get the URL

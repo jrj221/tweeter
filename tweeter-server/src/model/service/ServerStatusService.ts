@@ -8,6 +8,7 @@ export class ServerStatusService extends Service {
 		pageSize: number,
 		lastItem: StatusDTO | null,
 	): Promise<[StatusDTO[], boolean]> {
+		this.checkParams(token, userAlias, pageSize);
 		await this.doAuthenticate(token);
 		const feedDAO = this._daoFactory.makeFeedDAO();
 		const [dtos, hasMore] = await feedDAO.getPageOfFeedItems(userAlias, pageSize, lastItem);
@@ -21,6 +22,7 @@ export class ServerStatusService extends Service {
 		pageSize: number,
 		lastItem: StatusDTO | null,
 	): Promise<[StatusDTO[], boolean]> {
+		this.checkParams(token, userAlias, pageSize);
 		await this.doAuthenticate(token);
 		const statusDAO = this._daoFactory.makeStatusDAO();
 		const [dtos, hasMore] = await statusDAO.getPageOfStatuses(userAlias, pageSize, lastItem);
@@ -39,6 +41,7 @@ export class ServerStatusService extends Service {
 	}
 
 	public async postStatus(token: string, newStatus: Status): Promise<void> {
+		this.checkParams(token, newStatus);
 		await this.doAuthenticate(token);
 		
 		const statusDTO = newStatus.DTO;

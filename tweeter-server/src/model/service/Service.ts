@@ -29,4 +29,12 @@ export abstract class Service {
 		}
 		return timeSinceAuth < MAX_AUTH_TIME;
 	}
+
+	protected checkParams(...params: any[]) {
+		for (const param of params) {
+			if (param === null || param === undefined || param === "") {
+				throw new Error("bad-request");
+			}
+		}
+	}
 }
