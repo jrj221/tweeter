@@ -1,19 +1,12 @@
 import { Buffer } from "buffer";
-import { AuthToken, User, FakeData, UserDTO } from "tweeter-shared";
+import { FakeData, UserDTO } from "tweeter-shared";
 import { Service } from "./Service";
-import { DAOFactory } from "../../dao/DAOFactory";
 
-export class ServerUserService implements Service {
-	private _daoFactory: DAOFactory;
-
-	public constructor(daoFactory: DAOFactory) {
-		this._daoFactory = daoFactory;
-	}
-
+export class ServerUserService extends Service {
 	public async getUser(token: string, alias: string): Promise<UserDTO | null> {
+		await this.doAuthenticate(token);
 		const userDAO = this._daoFactory.makeUserDAO();
-		const user: User | null = await userDAO.findUserByAlias(alias);
-		return user?.DTO ?? null;
+		return await userDAO.findUserByAlias(alias);
 	}
 
 	public async logout(token: string): Promise<void> {

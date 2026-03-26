@@ -10,4 +10,7 @@ export interface FollowDAO {}
 
 export interface FeedDAO {}
 
-export interface AuthTokenDAO {}
+export interface AuthTokenDAO {
+	getAuthorizedTime(token: string): Promise<number | null>;
+	updateAuthorizedTime(token: string): Promise<void>;
+}
