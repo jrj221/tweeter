@@ -1,25 +1,24 @@
-import { AuthTokenDAO, FeedDAO, FollowDAO, StatusDAO, UserDAO } from "../DAO";
-import { Factory } from "../Factory";
+import { DAOFactory } from "../DAOFactory";
 import { DynamoDBAuthTokenDAO } from "./DynamoDBAuthTokenDAO";
 import { DynamoDBFeedDAO } from "./DynamoDBFeedDAO";
 import { DynamoDBFollowDAO } from "./DynamoDBFollowDAO";
 import { DynamoDBStatusDAO } from "./DynamoDBStatusDAO";
 import { DynamoDBUserDAO } from "./DynamoDBUserDAO";
 
-export class DynamoDBFactory implements Factory {
-	makeAuthTokenDAO(): AuthTokenDAO {
+export class DynamoDBDAOFactory implements DAOFactory {
+	makeAuthTokenDAO(): DynamoDBAuthTokenDAO {
 		return new DynamoDBAuthTokenDAO();
 	}
-	makeFeedDAO(): FeedDAO {
+	makeFeedDAO(): DynamoDBFeedDAO {
 		return new DynamoDBFeedDAO();
 	}
-	makeFollowDAO(): FollowDAO {
+	makeFollowDAO(): DynamoDBFollowDAO {
 		return new DynamoDBFollowDAO();
 	}
-	makeStatusDAO(): StatusDAO {
+	makeStatusDAO(): DynamoDBStatusDAO {
 		return new DynamoDBStatusDAO();
 	}
-	makeUserDAO(): UserDAO {
+	makeUserDAO(): DynamoDBUserDAO {
 		return new DynamoDBUserDAO();
 	}
 }

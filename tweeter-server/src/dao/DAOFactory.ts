@@ -1,6 +1,6 @@
 import { AuthTokenDAO, FeedDAO, FollowDAO, StatusDAO, UserDAO } from "./DAO";
 
-export interface Factory {
+export interface DAOFactory {
 	makeUserDAO(): UserDAO;
 	makeStatusDAO(): StatusDAO;
 	makeFollowDAO(): FollowDAO;
