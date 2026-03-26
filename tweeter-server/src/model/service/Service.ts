@@ -1,8 +1,7 @@
+import { AuthToken, MAX_AUTH_TIME } from "tweeter-shared";
 import { DAOFactory } from "../../dao/DAOFactory";
 
 export abstract class Service {
-	private MAX_AUTH_TIME = 2 * 60 * 1000;
-
 	protected _daoFactory: DAOFactory;
 
 	public constructor(daoFactory: DAOFactory) {
@@ -16,9 +15,9 @@ export abstract class Service {
 	 */
 	protected async doAuthenticate(token: string): Promise<void> {
 		if (!this.isAuthenticated(token)) {
-			throw new Error("Invalid token");
+			throw new Error("unauthorized");
 		}
-		const authTokenDAO = this._daoFactory.makeAuthTokenDAO();
+		const authTokenDAO = this._daoFactory.makeAuthTokenDAO(); // Should you call for a dao every time you need one, or at what point do you make a dao for the entire class?
 		await authTokenDAO.updateAuthorizedTime(token);
 	}
 
@@ -26,8 +25,8 @@ export abstract class Service {
 		const authTokenDAO = this._daoFactory.makeAuthTokenDAO();
 		const timeSinceAuth = await authTokenDAO.getAuthorizedTime(token);
 		if (timeSinceAuth === null) {
-			throw new Error("Cannot find token in database"); // Figure out how the error handling works!
+			throw new Error("bad-request"); // Figure out how the error handling works
 		}
-		return timeSinceAuth < this.MAX_AUTH_TIME;
+		return timeSinceAuth < MAX_AUTH_TIME;
 	}
 }

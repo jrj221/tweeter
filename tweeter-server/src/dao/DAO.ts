@@ -1,16 +1,49 @@
-import { UserDTO } from "tweeter-shared";
+import { StatusDTO, UserDTO } from "tweeter-shared";
 
 export interface UserDAO {
-	findUserByAlias(alias: string): Promise<UserDTO | null>; // What if other implementations weren't asynchronous?
+	findUserByAlias(alias: string): Promise<UserDTO | null>;
+	addUser(user: UserDTO): Promise<void>;
+	updateFollowerCount(alias: string, count: number): Promise<void>;
+	updateFolloweeCount(alias: string, count: number): Promise<void>;
 }
 
-export interface StatusDAO {}
+export interface StatusDAO {
+	addStatus(status: StatusDTO): Promise<void>;
+	getPageOfStatuses(
+		userAlias: string,
+		pageSize: number,
+		lastItem: StatusDTO | null,
+	): Promise<[StatusDTO[], boolean]>;
+}
 
-export interface FollowDAO {}
+export interface FollowDAO {
+	addFollow(followerAlias: string, followeeAlias: string): Promise<void>;
+	removeFollow(followerAlias: string, followeeAlias: string): Promise<void>;
+	getIsFollower(followerAlias: string, followeeAlias: string): Promise<boolean>;
+	getPageOfFollowers(
+		followeeAlias: string,
+		pageSize: number,
+		lastItem: UserDTO | null,
+	): Promise<[UserDTO[], boolean]>;
+	getPageOfFollowees(
+		followerAlias: string,
+		pageSize: number,
+		lastItem: UserDTO | null,
+	): Promise<[UserDTO[], boolean]>;
+}
 
-export interface FeedDAO {}
+export interface FeedDAO {
+	addFeedItem(followerAlias: string, status: StatusDTO): Promise<void>;
+	getPageOfFeedItems(
+		followerAlias: string,
+		pageSize: number,
+		lastItem: StatusDTO | null,
+	): Promise<[StatusDTO[], boolean]>;
+}
 
 export interface AuthTokenDAO {
 	getAuthorizedTime(token: string): Promise<number | null>;
 	updateAuthorizedTime(token: string): Promise<void>;
+	addAuthToken(token: string, userAlias: string, expiresAt: number): Promise<void>;
+	removeAuthToken(token: string): Promise<void>;
 }

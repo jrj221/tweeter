@@ -1,4 +1,7 @@
 import { v4 as uuid } from "uuid";
+
+export const MAX_AUTH_TIME = 2 * 60 * 1000;
+
 export class AuthToken {
   private _token: string;
   private _timestamp: number;

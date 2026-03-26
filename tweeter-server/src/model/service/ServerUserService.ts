@@ -1,5 +1,5 @@
 import { Buffer } from "buffer";
-import { FakeData, UserDTO } from "tweeter-shared";
+import { FakeData, UserDTO, MAX_AUTH_TIME } from "tweeter-shared";
 import { Service } from "./Service";
 
 export class ServerUserService extends Service {
@@ -10,12 +10,24 @@ export class ServerUserService extends Service {
 	}
 
 	public async logout(token: string): Promise<void> {
-		// Pause so we can see the logging out message. Delete when the call to the server is implemented.
-		// await new Promise((res) => setTimeout(res, 1000));
+		await this.doAuthenticate(token);
+		const authTokenDAO = this._daoFactory.makeAuthTokenDAO();
+		await authTokenDAO.removeAuthToken(token);
 	}
 
 	public async login(alias: string, password: string): Promise<[UserDTO, string]> {
-		return this.returnUser();
+		const userDAO = this._daoFactory.makeUserDAO();
+		const user = await userDAO.findUserByAlias(alias);
+
+		if (user === null) {
+			throw new Error("Invalid alias or password"); // Real password check would go here
+		}
+
+		const authToken = FakeData.instance.authToken.token; // hardcode for now
+		const authTokenDAO = this._daoFactory.makeAuthTokenDAO();
+		await authTokenDAO.addAuthToken(authToken, alias, Date.now() + MAX_AUTH_TIME); 
+
+		return [user, authToken];
 	}
 
 	public async register(
@@ -26,17 +38,24 @@ export class ServerUserService extends Service {
 		userImageBytes: Uint8Array,
 		imageFileExtension: string,
 	): Promise<[UserDTO, string]> {
-		const imageStringBase64: string = Buffer.from(userImageBytes).toString("base64");
-		return this.returnUser();
-	}
+		const userDAO = this._daoFactory.makeUserDAO();
+		
+		// In a real app, we would upload the image to S3 here and get the URL
+		const imageURL = "https://example.com/image.png"; 
+		
+		const newUser: UserDTO = {
+			firstName,
+			lastName,
+			alias,
+			imageURL,
+		};
 
-	private async returnUser() {
-		const user = FakeData.instance.firstUser;
+		await userDAO.addUser(newUser);
 
-		if (user === null) {
-			throw new Error("Invalid registration");
-		}
+		const authToken = FakeData.instance.authToken.token; // hardcode for now
+		const authTokenDAO = this._daoFactory.makeAuthTokenDAO();
+		await authTokenDAO.addAuthToken(authToken, alias, Date.now() + MAX_AUTH_TIME);
 
-		return [user.DTO, FakeData.instance.authToken.token] as [UserDTO, string]; // TS interprets it as an array instead of tuple without this cast idk why
+		return [newUser, authToken];
 	}
 }
