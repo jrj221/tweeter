@@ -35,7 +35,12 @@ export class ServerStatusService extends Service {
 		for (const dto of dtos) {
 			const user = await userDAO.findUserByAlias(dto.user.alias);
 			if (user) {
-				(dto as any).user = user;
+				(dto as any).user = {
+					firstName: user.firstName,
+					lastName: user.lastName,
+					alias: user.alias,
+					imageURL: user.imageURL,
+				};
 			}
 		}
 	}

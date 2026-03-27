@@ -1,8 +1,16 @@
 import { StatusDTO, UserDTO } from "tweeter-shared";
 
 export interface UserDAO {
-	findUserByAlias(alias: string): Promise<UserDTO | null>;
-	addUser(user: UserDTO): Promise<void>;
+	findUserByAlias(alias: string): Promise<{
+		firstName: string;
+		lastName: string;
+		alias: string;
+		imageURL: string;
+		passwordHash: string;
+		followerCount: number;
+		followeeCount: number;
+	} | null>;
+	addUser(firstName: string, lastName: string, alias: string, passwordHash: string, imageURL: string): Promise<void>;
 	updateFollowerCount(alias: string, count: number): Promise<void>;
 	updateFolloweeCount(alias: string, count: number): Promise<void>;
 }

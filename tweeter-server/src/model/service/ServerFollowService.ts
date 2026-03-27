@@ -35,7 +35,12 @@ export class ServerFollowService extends Service {
 		for (const dto of dtos) {
 			const user = await userDAO.findUserByAlias(dto.alias);
 			if (user) {
-				Object.assign(dto, user);
+				Object.assign(dto, {
+					firstName: user.firstName,
+					lastName: user.lastName,
+					alias: user.alias,
+					imageURL: user.imageURL,
+				});
 			}
 		}
 	}
@@ -52,7 +57,7 @@ export class ServerFollowService extends Service {
 		await this.doAuthenticate(token);
 		const userDAO = this._daoFactory.makeUserDAO();
 		const user = await userDAO.findUserByAlias(userAlias);
-		return (user as any)?.followeeCount ?? 0;
+		return user?.followeeCount ?? 0;
 	}
 
 	public async getFollowerCount(token: string, userAlias: string): Promise<number> {
@@ -60,7 +65,7 @@ export class ServerFollowService extends Service {
 		await this.doAuthenticate(token);
 		const userDAO = this._daoFactory.makeUserDAO();
 		const user = await userDAO.findUserByAlias(userAlias);
-		return (user as any)?.followerCount ?? 0;
+		return user?.followerCount ?? 0;
 	}
 
 	public async follow(

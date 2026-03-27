@@ -9,10 +9,19 @@ export class DynamoDBUserDAO extends DynamoDBDAO implements UserDAO {
 	private readonly _firstNameAttr = "firstName";
 	private readonly _lastNameAttr = "lastName";
 	private readonly _imageURLAttr = "imageURL";
+	private readonly _passwordAttr = "password";
 	private readonly _followerCountAttr = "followerCount";
 	private readonly _followeeCountAttr = "followeeCount";
 
-	async findUserByAlias(alias: string): Promise<UserDTO | null> {
+	async findUserByAlias(alias: string): Promise<{
+		firstName: string;
+		lastName: string;
+		alias: string;
+		imageURL: string;
+		passwordHash: string;
+		followerCount: number;
+		followeeCount: number;
+	} | null> {
 		const params = {
 			TableName: this._tableName,
 			Key: {
@@ -28,17 +37,27 @@ export class DynamoDBUserDAO extends DynamoDBDAO implements UserDAO {
 					lastName: output.Item[this._lastNameAttr],
 					alias: output.Item[this._aliasAttr],
 					imageURL: output.Item[this._imageURLAttr],
+					passwordHash: output.Item[this._passwordAttr],
+					followerCount: output.Item[this._followerCountAttr],
+					followeeCount: output.Item[this._followeeCountAttr],
 				};
 	}
 
-	async addUser(user: UserDTO): Promise<void> {
+	async addUser(
+		firstName: string,
+		lastName: string,
+		alias: string,
+		passwordHash: string,
+		imageURL: string,
+	): Promise<void> {
 		const params = {
 			TableName: this._tableName,
 			Item: {
-				[this._aliasAttr]: user.alias,
-				[this._firstNameAttr]: user.firstName,
-				[this._lastNameAttr]: user.lastName,
-				[this._imageURLAttr]: user.imageURL,
+				[this._aliasAttr]: alias,
+				[this._firstNameAttr]: firstName,
+				[this._lastNameAttr]: lastName,
+				[this._passwordAttr]: passwordHash,
+				[this._imageURLAttr]: imageURL,
 				[this._followerCountAttr]: 0,
 				[this._followeeCountAttr]: 0,
 			},

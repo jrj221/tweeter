@@ -1,5 +1,6 @@
 import { Buffer } from "buffer";
 import { FakeData, UserDTO, MAX_AUTH_TIME } from "tweeter-shared";
+import bcryptjs from "bcryptjs";
 import { Service } from "./Service";
 
 export class ServerUserService extends Service {
@@ -7,7 +8,15 @@ export class ServerUserService extends Service {
 		this.checkParams(token, alias);
 		await this.doAuthenticate(token);
 		const userDAO = this._daoFactory.makeUserDAO();
-		return await userDAO.findUserByAlias(alias);
+		const user = await userDAO.findUserByAlias(alias);
+		return user === null
+			? null
+			: {
+					firstName: user.firstName,
+					lastName: user.lastName,
+					alias: user.alias,
+					imageURL: user.imageURL,
+				};
 	}
 
 	public async logout(token: string): Promise<void> {
@@ -22,15 +31,22 @@ export class ServerUserService extends Service {
 		const userDAO = this._daoFactory.makeUserDAO();
 		const user = await userDAO.findUserByAlias(alias);
 
-		if (user === null) {
-			throw new Error("Invalid alias or password"); // Real password check would go here
+		if (user === null || !(await bcryptjs.compare(password, user.passwordHash))) {
+			throw new Error("bad-request");
 		}
+
+		const userDto: UserDTO = {
+			firstName: user.firstName,
+			lastName: user.lastName,
+			alias: user.alias,
+			imageURL: user.imageURL,
+		};
 
 		const authToken = FakeData.instance.authToken.token; // hardcode for now
 		const authTokenDAO = this._daoFactory.makeAuthTokenDAO();
-		await authTokenDAO.addAuthToken(authToken, alias, Date.now() + MAX_AUTH_TIME); 
+		await authTokenDAO.addAuthToken(authToken, alias, Date.now() + MAX_AUTH_TIME);
 
-		return [user, authToken];
+		return [userDto, authToken];
 	}
 
 	public async register(
@@ -43,10 +59,10 @@ export class ServerUserService extends Service {
 	): Promise<[UserDTO, string]> {
 		this.checkParams(firstName, lastName, alias, password, userImageBytes, imageFileExtension);
 		const userDAO = this._daoFactory.makeUserDAO();
-		
+
 		// In a real app, we would upload the image to S3 here and get the URL
-		const imageURL = "https://example.com/image.png"; 
-		
+		const imageURL = "https://example.com/image.png";
+
 		const newUser: UserDTO = {
 			firstName,
 			lastName,
@@ -54,7 +70,9 @@ export class ServerUserService extends Service {
 			imageURL,
 		};
 
-		await userDAO.addUser(newUser);
+		const salt = await bcryptjs.genSalt();
+		const hashedPassword = await bcryptjs.hash(password, salt);
+		await userDAO.addUser(firstName, lastName, alias, hashedPassword, imageURL);
 
 		const authToken = FakeData.instance.authToken.token; // hardcode for now
 		const authTokenDAO = this._daoFactory.makeAuthTokenDAO();
