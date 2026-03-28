@@ -1,4 +1,5 @@
 import { Buffer } from "buffer";
+import { v4 as uuidv4 } from "uuid";
 import { FakeData, UserDTO, MAX_AUTH_TIME } from "tweeter-shared";
 import bcryptjs from "bcryptjs";
 import { Service } from "./Service";
@@ -43,6 +44,7 @@ export class ServerUserService extends Service {
 		};
 
 		const authToken = FakeData.instance.authToken.token; // hardcode for now
+
 		const authTokenDAO = this._daoFactory.makeAuthTokenDAO();
 		await authTokenDAO.addAuthToken(authToken, alias, Date.now() + MAX_AUTH_TIME);
 
@@ -74,7 +76,7 @@ export class ServerUserService extends Service {
 		const hashedPassword = await bcryptjs.hash(password, salt);
 		await userDAO.addUser(firstName, lastName, alias, hashedPassword, imageURL);
 
-		const authToken = FakeData.instance.authToken.token; // hardcode for now
+		const authToken = uuidv4();
 		const authTokenDAO = this._daoFactory.makeAuthTokenDAO();
 		await authTokenDAO.addAuthToken(authToken, alias, Date.now() + MAX_AUTH_TIME);
 
