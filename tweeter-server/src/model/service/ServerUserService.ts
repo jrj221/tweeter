@@ -1,4 +1,3 @@
-import { Buffer } from "buffer";
 import { v4 as uuidv4 } from "uuid";
 import { FakeData, UserDTO, MAX_AUTH_TIME } from "tweeter-shared";
 import bcryptjs from "bcryptjs";
@@ -63,7 +62,11 @@ export class ServerUserService extends Service {
 		const userDAO = this._daoFactory.makeUserDAO();
 
 		// In a real app, we would upload the image to S3 here and get the URL
-		const imageURL = "https://example.com/image.png";
+		const imageDAO = this._daoFactory.makeImageDAO();
+		const filename = uuidv4();
+		const imageStringBase64Encoded = Buffer.from(userImageBytes).toString("base64");
+		await imageDAO.putImage(`${alias}-${filename}.${imageFileExtension}`, imageStringBase64Encoded);
+		const imageURL = `https://tweeter-images-s3bucket.s3.us-east-1.amazonaws.com/image/${alias}-${filename}.${imageFileExtension}`;
 
 		const newUser: UserDTO = {
 			firstName,

@@ -1,4 +1,6 @@
+import { ImageDAO } from "../DAO";
 import { DAOFactory } from "../DAOFactory";
+import { S3ImageDAO } from "../S3/S3ImageDAO";
 import { DynamoDBAuthTokenDAO } from "./DynamoDBAuthTokenDAO";
 import { DynamoDBFeedDAO } from "./DynamoDBFeedDAO";
 import { DynamoDBFollowDAO } from "./DynamoDBFollowDAO";
@@ -11,6 +13,7 @@ export class DynamoDBDAOFactory implements DAOFactory {
 	private readonly _followDAO: DynamoDBFollowDAO = new DynamoDBFollowDAO();
 	private readonly _statusDAO: DynamoDBStatusDAO = new DynamoDBStatusDAO();
 	private readonly _userDAO: DynamoDBUserDAO = new DynamoDBUserDAO();
+	private readonly _imageDAO: ImageDAO = new S3ImageDAO();
 
 	makeAuthTokenDAO(): DynamoDBAuthTokenDAO {
 		return this._authTokenDAO;
@@ -26,5 +29,8 @@ export class DynamoDBDAOFactory implements DAOFactory {
 	}
 	makeUserDAO(): DynamoDBUserDAO {
 		return this._userDAO;
+	}
+	makeImageDAO(): ImageDAO {
+		return this._imageDAO;
 	}
 }

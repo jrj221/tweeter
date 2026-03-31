@@ -17,11 +17,7 @@ export interface UserDAO {
 
 export interface StatusDAO {
 	addStatus(status: StatusDTO): Promise<void>;
-	getPageOfStatuses(
-		userAlias: string,
-		pageSize: number,
-		lastItem: StatusDTO | null,
-	): Promise<[StatusDTO[], boolean]>;
+	getPageOfStatuses(userAlias: string, pageSize: number, lastItem: StatusDTO | null): Promise<[StatusDTO[], boolean]>;
 }
 
 export interface FollowDAO {
@@ -54,4 +50,8 @@ export interface AuthTokenDAO {
 	updateAuthorizedTime(token: string): Promise<void>;
 	addAuthToken(token: string, userAlias: string, expiresAt: number): Promise<void>;
 	removeAuthToken(token: string): Promise<void>;
+}
+
+export interface ImageDAO {
+	putImage(filename: string, imageStringBase64Encoded: string): Promise<string>;
 }
