@@ -50,11 +50,13 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
 
 	private async changeFollowingStatusForDisplayUser(
 		displayedUser: User | null,
+		currentUser: User | null,
 		authToken: AuthToken | null,
 		following: boolean,
 		followingStatusOperation: (
 			authToken: AuthToken,
-			userToUnfollow: User
+			currentUser: User,
+			displayedUser: User
 		) => Promise<[followerCount: number, followeeCount: number]>
 	) {
 		var followingStatusUserMessage = "";
@@ -67,7 +69,11 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
 					0
 				);
 
-				const [followerCount, followeeCount] = await followingStatusOperation(authToken!, displayedUser!);
+				const [followerCount, followeeCount] = await followingStatusOperation(
+					authToken!,
+					currentUser!,
+					displayedUser!
+				);
 
 				this.view.setIsFollower(following ? true : false);
 				this.view.setFolloweeCount(followeeCount);
@@ -81,12 +87,32 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
 		);
 	}
 
-	public async followDisplayedUser(displayedUser: User | null, authToken: AuthToken | null) {
-		this.changeFollowingStatusForDisplayUser(displayedUser, authToken, true, this.followService.follow);
+	public async followDisplayedUser(
+		displayedUser: User | null,
+		currentUser: User | null,
+		authToken: AuthToken | null
+	) {
+		this.changeFollowingStatusForDisplayUser(
+			displayedUser,
+			currentUser,
+			authToken,
+			true,
+			this.followService.follow
+		);
 	}
 
-	public async unfollowDisplayedUser(displayedUser: User | null, authToken: AuthToken | null) {
-		this.changeFollowingStatusForDisplayUser(displayedUser, authToken, false, this.followService.unfollow);
+	public async unfollowDisplayedUser(
+		displayedUser: User | null,
+		currentUser: User | null,
+		authToken: AuthToken | null
+	) {
+		this.changeFollowingStatusForDisplayUser(
+			displayedUser,
+			currentUser,
+			authToken,
+			false,
+			this.followService.unfollow
+		);
 	}
 
 	public switchToLoggedInUser(currentUser: User | null) {

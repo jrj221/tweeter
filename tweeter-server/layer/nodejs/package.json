@@ -1,0 +1,11 @@
+{
+  "name": "tweeter-layer",
+  "version": "1.0.0",
+  "description": "Dependencies for tweeter Lambda functions",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "date-fns": "^3.3.1",
+    "uuid": "^9.0.1",
+    "tweeter-shared": "file:../../../tweeter-shared"
+  }
+}

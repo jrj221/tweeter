@@ -3,18 +3,27 @@ import { ServerFollowService } from "../../model/service/ServerFollowService";
 import { DynamoDBDAOFactory } from "../../dao/DynamoDBDAO/DynamoDBFactory";
 
 export const handler = async (request: FollowActionRequest): Promise<FollowActionResponse> => {
-	const followService = new ServerFollowService(new DynamoDBDAOFactory());
+	try {
+		const followService = new ServerFollowService(new DynamoDBDAOFactory());
 
-	const [followerCount, followeeCount] = await followService.follow(
-		request.token,
-		request.user.alias,
-		request.targetUser.alias,
-	);
+		const [followerCount, followeeCount] = await followService.follow(
+			request.token,
+			request.user.alias,
+			request.targetUser.alias,
+		);
 
-	return {
-		success: true,
-		message: null,
-		followerCount,
-		followeeCount,
-	};
+		return {
+			success: true,
+			message: null,
+			followerCount,
+			followeeCount,
+		};
+	} catch (error) {
+		return {
+			success: false,
+			message: (error as Error).message,
+			followerCount: 0,
+			followeeCount: 0,
+		};
+	}
 };

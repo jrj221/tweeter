@@ -97,7 +97,7 @@ export class ServerFacade {
 
 		if (response.success) {
 			const user = User.fromDTO(response.userDTO);
-			const authToken = new AuthToken(response.token, Date.now());
+			const authToken = new AuthToken(response.token!, Date.now());
 			return [user!, authToken]; // Any way to ensure this ALWAYS returns a user?
 		} else {
 			console.error(response);
@@ -113,7 +113,7 @@ export class ServerFacade {
 
 		if (response.success) {
 			const user = User.fromDTO(response.userDTO);
-			const authToken = new AuthToken(response.token, Date.now());
+			const authToken = new AuthToken(response.token!, Date.now());
 			return [user!, authToken];
 		} else {
 			console.error(response);

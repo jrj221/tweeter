@@ -1,13 +1,20 @@
 import { LogoutRequest, LogoutResponse } from "tweeter-shared";
 import { ServerUserService } from "../../model/service/ServerUserService";
+import { DynamoDBDAOFactory } from "../../dao/DynamoDBDAO/DynamoDBFactory";
 
 export const handler = async (request: LogoutRequest): Promise<LogoutResponse> => {
-	const userService = new ServerUserService();
+	try {
+		const userService = new ServerUserService(new DynamoDBDAOFactory());
+		await userService.logout(request.token);
 
-	await userService.logout(request.token);
-
-	return {
-		success: true,
-		message: null,
-	};
+		return {
+			success: true,
+			message: null,
+		};
+	} catch (error) {
+		return {
+			success: false,
+			message: (error as Error).message,
+		};
+	}
 };

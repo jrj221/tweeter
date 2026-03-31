@@ -1,25 +1,58 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServerStatusService = void 0;
-const tweeter_shared_1 = require("tweeter-shared");
-class ServerStatusService {
+const Service_1 = require("./Service");
+class ServerStatusService extends Service_1.Service {
     async loadMoreFeedItems(token, userAlias, pageSize, lastItem) {
-        // TODO: Replace with the result of calling server
-        return this.getFakeData(lastItem, pageSize);
+        this.checkParams(token, userAlias, pageSize);
+        await this.doAuthenticate(token);
+        const feedDAO = this._daoFactory.makeFeedDAO();
+        const [dtos, hasMore] = await feedDAO.getPageOfFeedItems(userAlias, pageSize, lastItem);
+        await this.populateUserDTOs(dtos);
+        return [dtos, hasMore];
     }
     async loadMoreStoryItems(token, userAlias, pageSize, lastItem) {
-        // TODO: Replace with the result of calling server
-        return this.getFakeData(lastItem, pageSize);
+        this.checkParams(token, userAlias, pageSize);
+        await this.doAuthenticate(token);
+        const statusDAO = this._daoFactory.makeStatusDAO();
+        const [dtos, hasMore] = await statusDAO.getPageOfStatuses(userAlias, pageSize, lastItem);
+        await this.populateUserDTOs(dtos);
+        return [dtos, hasMore];
     }
-    async getFakeData(lastItem, pageSize) {
-        const [items, hasMoreItems] = tweeter_shared_1.FakeData.instance.getPageOfStatuses(tweeter_shared_1.Status.fromDTO(lastItem), pageSize);
-        const dtos = items.map((status) => status.DTO);
-        return [dtos, hasMoreItems];
+    async populateUserDTOs(dtos) {
+        const userDAO = this._daoFactory.makeUserDAO();
+        for (const dto of dtos) {
+            const user = await userDAO.findUserByAlias(dto.user.alias);
+            if (user) {
+                dto.user = {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    alias: user.alias,
+                    imageURL: user.imageURL,
+                };
+            }
+        }
     }
     async postStatus(token, newStatus) {
-        // Pause so we can see the logging out message. Remove when connected to the server
-        await new Promise((f) => setTimeout(f, 2000));
-        // TODO: Call the server to post the status
+        this.checkParams(token, newStatus);
+        await this.doAuthenticate(token);
+        const statusDTO = newStatus.DTO;
+        const statusDAO = this._daoFactory.makeStatusDAO();
+        await statusDAO.addStatus(statusDTO);
+        const followDAO = this._daoFactory.makeFollowDAO();
+        const feedDAO = this._daoFactory.makeFeedDAO();
+        let lastFollower = null;
+        let hasMoreFollowers = true;
+        while (hasMoreFollowers) {
+            const [followers, more] = await followDAO.getPageOfFollowers(statusDTO.user.alias, 100, lastFollower);
+            for (const follower of followers) {
+                await feedDAO.addFeedItem(follower.alias, statusDTO);
+            }
+            hasMoreFollowers = more;
+            if (followers.length > 0) {
+                lastFollower = followers[followers.length - 1];
+            }
+        }
     }
 }
 exports.ServerStatusService = ServerStatusService;
