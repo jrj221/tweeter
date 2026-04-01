@@ -8,12 +8,14 @@ export class ServerFollowService extends Service {
 		pageSize: number,
 		lastItem: UserDTO | null,
 	): Promise<[UserDTO[], boolean]> {
-		this.checkParams(token, userAlias, pageSize);
-		await this.doAuthenticate(token);
-		const followDAO = this._daoFactory.makeFollowDAO();
-		const [dtos, hasMore] = await followDAO.getPageOfFollowees(userAlias, pageSize, lastItem);
-		await this.populateUserDetails(dtos);
-		return [dtos, hasMore];
+		return await this.getMoreItems(
+			token,
+			userAlias,
+			pageSize,
+			lastItem,
+			(alias, limit, last) => this._daoFactory.makeFollowDAO().getPageOfFollowees(alias, limit, last),
+			(items) => this.populateUsers(items, (item) => item.alias, Object.assign),
+		);
 	}
 
 	public async loadMoreFollowers(
@@ -22,27 +24,14 @@ export class ServerFollowService extends Service {
 		pageSize: number,
 		lastItem: UserDTO | null,
 	): Promise<[UserDTO[], boolean]> {
-		this.checkParams(token, userAlias, pageSize);
-		await this.doAuthenticate(token);
-		const followDAO = this._daoFactory.makeFollowDAO();
-		const [dtos, hasMore] = await followDAO.getPageOfFollowers(userAlias, pageSize, lastItem);
-		await this.populateUserDetails(dtos);
-		return [dtos, hasMore];
-	}
-
-	private async populateUserDetails(dtos: UserDTO[]) {
-		const userDAO = this._daoFactory.makeUserDAO();
-		for (const dto of dtos) {
-			const user = await userDAO.findUserByAlias(dto.alias);
-			if (user) {
-				Object.assign(dto, {
-					firstName: user.firstName,
-					lastName: user.lastName,
-					alias: user.alias,
-					imageURL: user.imageURL,
-				});
-			}
-		}
+		return await this.getMoreItems(
+			token,
+			userAlias,
+			pageSize,
+			lastItem,
+			(alias, limit, last) => this._daoFactory.makeFollowDAO().getPageOfFollowers(alias, limit, last),
+			(items) => this.populateUsers(items, (item) => item.alias, Object.assign),
+		);
 	}
 
 	public async getIsFollowerStatus(token: string, userAlias: string, selectedUserAlias: string): Promise<boolean> {
@@ -53,19 +42,23 @@ export class ServerFollowService extends Service {
 	}
 
 	public async getFolloweeCount(token: string, userAlias: string): Promise<number> {
-		this.checkParams(token, userAlias);
-		await this.doAuthenticate(token);
-		const userDAO = this._daoFactory.makeUserDAO();
-		const user = await userDAO.findUserByAlias(userAlias);
-		return user?.followeeCount ?? -1;
+		return this.getCount(token, userAlias, "followeeCount");
 	}
 
 	public async getFollowerCount(token: string, userAlias: string): Promise<number> {
+		return this.getCount(token, userAlias, "followerCount");
+	}
+
+	private async getCount(
+		token: string,
+		userAlias: string,
+		countType: "followerCount" | "followeeCount",
+	): Promise<number> {
 		this.checkParams(token, userAlias);
 		await this.doAuthenticate(token);
 		const userDAO = this._daoFactory.makeUserDAO();
 		const user = await userDAO.findUserByAlias(userAlias);
-		return user?.followerCount ?? -1;
+		return user?.[countType] ?? -1;
 	}
 
 	public async follow(
@@ -73,20 +66,7 @@ export class ServerFollowService extends Service {
 		userAlias: string,
 		userToFollowAlias: string,
 	): Promise<[followerCount: number, followeeCount: number]> {
-		this.checkParams(token, userAlias, userToFollowAlias);
-		await this.doAuthenticate(token);
-
-		const followDAO = this._daoFactory.makeFollowDAO();
-		const userDAO = this._daoFactory.makeUserDAO();
-
-		await followDAO.addFollow(userAlias, userToFollowAlias);
-		await userDAO.updateFolloweeCount(userAlias, 1);
-		await userDAO.updateFollowerCount(userToFollowAlias, 1);
-
-		const followerCount = await this.getFollowerCount(token, userToFollowAlias);
-		const followeeCount = await this.getFolloweeCount(token, userToFollowAlias);
-
-		return [followerCount, followeeCount];
+		return await this.doFollowAction(token, userAlias, userToFollowAlias, true);
 	}
 
 	public async unfollow(
@@ -94,18 +74,33 @@ export class ServerFollowService extends Service {
 		userAlias: string,
 		userToUnfollowAlias: string,
 	): Promise<[followerCount: number, followeeCount: number]> {
-		this.checkParams(token, userAlias, userToUnfollowAlias);
+		return await this.doFollowAction(token, userAlias, userToUnfollowAlias, false);
+	}
+
+	private async doFollowAction(
+		token: string,
+		userAlias: string,
+		targetAlias: string,
+		isFollow: boolean,
+	): Promise<[followerCount: number, followeeCount: number]> {
+		this.checkParams(token, userAlias, targetAlias);
 		await this.doAuthenticate(token);
 
 		const followDAO = this._daoFactory.makeFollowDAO();
 		const userDAO = this._daoFactory.makeUserDAO();
 
-		await followDAO.removeFollow(userAlias, userToUnfollowAlias);
-		await userDAO.updateFolloweeCount(userAlias, -1);
-		await userDAO.updateFollowerCount(userToUnfollowAlias, -1);
+		if (isFollow) {
+			await followDAO.addFollow(userAlias, targetAlias);
+			await userDAO.updateFolloweeCount(userAlias, 1);
+			await userDAO.updateFollowerCount(targetAlias, 1);
+		} else {
+			await followDAO.removeFollow(userAlias, targetAlias);
+			await userDAO.updateFolloweeCount(userAlias, -1);
+			await userDAO.updateFollowerCount(targetAlias, -1);
+		}
 
-		const followerCount = await this.getFollowerCount(token, userToUnfollowAlias);
-		const followeeCount = await this.getFolloweeCount(token, userToUnfollowAlias);
+		const followerCount = await this.getFollowerCount(token, targetAlias);
+		const followeeCount = await this.getFolloweeCount(token, targetAlias);
 
 		return [followerCount, followeeCount];
 	}

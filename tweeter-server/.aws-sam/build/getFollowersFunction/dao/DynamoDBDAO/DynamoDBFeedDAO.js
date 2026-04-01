@@ -24,27 +24,26 @@ class DynamoDBFeedDAO extends DynamoDBDAO_1.DynamoDBDAO {
         await this._client.send(new lib_dynamodb_1.PutCommand(params));
     }
     async getPageOfFeedItems(followerAlias, pageSize, lastItem) {
-        const params = {
+        const [items, hasMore] = await this.getPage({
             TableName: this._tableName,
             KeyConditionExpression: "#followerAlias = :followerAlias",
             ExpressionAttributeNames: { "#followerAlias": this._followerAliasAttr },
             ExpressionAttributeValues: { ":followerAlias": followerAlias },
             Limit: pageSize,
-        };
-        if (lastItem !== null) {
-            params.ExclusiveStartKey = {
-                [this._followerAliasAttr]: followerAlias,
-                [this._timestampAttr]: lastItem.timestamp,
-            };
-        }
-        const output = await this._client.send(new lib_dynamodb_1.QueryCommand(params));
-        const statuses = output.Items?.map((item) => ({
+            ExclusiveStartKey: lastItem === null
+                ? undefined
+                : {
+                    [this._followerAliasAttr]: followerAlias,
+                    [this._timestampAttr]: lastItem.timestamp,
+                },
+        });
+        const statuses = items.map((item) => ({
             post: item[this._postAttr],
             timestamp: item[this._timestampAttr],
             segments: item[this._segmentsAttr],
             user: { alias: item[this._authorAliasAttr], firstName: "", lastName: "", imageURL: "" },
-        })) ?? [];
-        return [statuses, output.LastEvaluatedKey !== undefined];
+        }));
+        return [statuses, hasMore];
     }
 }
 exports.DynamoDBFeedDAO = DynamoDBFeedDAO;

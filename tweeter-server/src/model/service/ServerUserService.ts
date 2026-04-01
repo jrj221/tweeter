@@ -61,6 +61,11 @@ export class ServerUserService extends Service {
 		this.checkParams(firstName, lastName, alias, password, userImageBytes, imageFileExtension);
 		const userDAO = this._daoFactory.makeUserDAO();
 
+		const existingUser = await userDAO.findUserByAlias(alias);
+		if (existingUser !== null) {
+			throw new Error("bad-request: User with this alias already exists.");
+		}
+
 		const imageDAO = this._daoFactory.makeImageDAO();
 		const filename = uuidv4();
 		await imageDAO.putImage(`${alias}-${filename}${imageFileExtension}`, userImageBytes);

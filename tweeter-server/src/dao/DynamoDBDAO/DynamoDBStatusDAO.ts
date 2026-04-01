@@ -1,4 +1,4 @@
-import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand } from "@aws-sdk/lib-dynamodb";
 import { StatusDAO } from "../DAO";
 import { DynamoDBDAO } from "./DynamoDBDAO";
 import { StatusDTO } from "tweeter-shared";
@@ -28,31 +28,29 @@ export class DynamoDBStatusDAO extends DynamoDBDAO implements StatusDAO {
 		pageSize: number,
 		lastItem: StatusDTO | null,
 	): Promise<[StatusDTO[], boolean]> {
-		const params: any = {
+		const [items, hasMore] = await this.getPage({
 			TableName: this._tableName,
 			KeyConditionExpression: "#authorAlias = :authorAlias",
 			ExpressionAttributeNames: { "#authorAlias": this._authorAliasAttr },
 			ExpressionAttributeValues: { ":authorAlias": userAlias },
 			Limit: pageSize,
-			ScanIndexForward: false, // Chronological order (descending by timestamp?)
-		};
+			ScanIndexForward: false,
+			ExclusiveStartKey:
+				lastItem === null
+					? undefined
+					: {
+							[this._authorAliasAttr]: userAlias,
+							[this._timestampAttr]: lastItem.timestamp,
+						},
+		});
 
-		if (lastItem !== null) {
-			params.ExclusiveStartKey = {
-				[this._authorAliasAttr]: userAlias,
-				[this._timestampAttr]: lastItem.timestamp,
-			};
-		}
+		const statuses = items.map((item) => ({
+			post: item[this._postAttr],
+			timestamp: item[this._timestampAttr],
+			segments: item[this._segmentsAttr],
+			user: { alias: item[this._authorAliasAttr], firstName: "", lastName: "", imageURL: "" },
+		}));
 
-		const output = await this._client.send(new QueryCommand(params));
-		const statuses =
-			output.Items?.map((item) => ({
-				post: item[this._postAttr],
-				timestamp: item[this._timestampAttr],
-				segments: item[this._segmentsAttr],
-				user: { alias: item[this._authorAliasAttr], firstName: "", lastName: "", imageURL: "" },
-			})) ?? [];
-
-		return [statuses as StatusDTO[], output.LastEvaluatedKey !== undefined];
+		return [statuses as StatusDTO[], hasMore];
 	}
 }

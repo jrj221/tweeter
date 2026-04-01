@@ -50,6 +50,10 @@ class ServerUserService extends Service_1.Service {
     async register(firstName, lastName, alias, password, userImageBytes, imageFileExtension) {
         this.checkParams(firstName, lastName, alias, password, userImageBytes, imageFileExtension);
         const userDAO = this._daoFactory.makeUserDAO();
+        const existingUser = await userDAO.findUserByAlias(alias);
+        if (existingUser !== null) {
+            throw new Error("bad-request: User with this alias already exists.");
+        }
         const imageDAO = this._daoFactory.makeImageDAO();
         const filename = (0, uuid_1.v4)();
         await imageDAO.putImage(`${alias}-${filename}${imageFileExtension}`, userImageBytes);

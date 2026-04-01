@@ -8,12 +8,14 @@ export class ServerStatusService extends Service {
 		pageSize: number,
 		lastItem: StatusDTO | null,
 	): Promise<[StatusDTO[], boolean]> {
-		this.checkParams(token, userAlias, pageSize);
-		await this.doAuthenticate(token);
-		const feedDAO = this._daoFactory.makeFeedDAO();
-		const [dtos, hasMore] = await feedDAO.getPageOfFeedItems(userAlias, pageSize, lastItem);
-		await this.populateUserDTOs(dtos);
-		return [dtos, hasMore];
+		return await this.getMoreItems(
+			token,
+			userAlias,
+			pageSize,
+			lastItem,
+			(alias, limit, last) => this._daoFactory.makeFeedDAO().getPageOfFeedItems(alias, limit, last),
+			(items) => this.populateUsers(items, (item) => item.user.alias, (item, user) => Object.assign(item, { user })),
+		);
 	}
 
 	public async loadMoreStoryItems(
@@ -22,27 +24,14 @@ export class ServerStatusService extends Service {
 		pageSize: number,
 		lastItem: StatusDTO | null,
 	): Promise<[StatusDTO[], boolean]> {
-		this.checkParams(token, userAlias, pageSize);
-		await this.doAuthenticate(token);
-		const statusDAO = this._daoFactory.makeStatusDAO();
-		const [dtos, hasMore] = await statusDAO.getPageOfStatuses(userAlias, pageSize, lastItem);
-		await this.populateUserDTOs(dtos);
-		return [dtos, hasMore];
-	}
-
-	private async populateUserDTOs(dtos: StatusDTO[]) {
-		const userDAO = this._daoFactory.makeUserDAO();
-		for (const dto of dtos) {
-			const user = await userDAO.findUserByAlias(dto.user.alias);
-			if (user) {
-				(dto as any).user = {
-					firstName: user.firstName,
-					lastName: user.lastName,
-					alias: user.alias,
-					imageURL: user.imageURL,
-				};
-			}
-		}
+		return await this.getMoreItems(
+			token,
+			userAlias,
+			pageSize,
+			lastItem,
+			(alias, limit, last) => this._daoFactory.makeStatusDAO().getPageOfStatuses(alias, limit, last),
+			(items) => this.populateUsers(items, (item) => item.user.alias, (item, user) => Object.assign(item, { user })),
+		);
 	}
 
 	public async postStatus(token: string, newStatus: Status): Promise<void> {

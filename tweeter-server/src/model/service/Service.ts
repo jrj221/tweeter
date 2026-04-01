@@ -1,4 +1,4 @@
-import { AuthToken, MAX_AUTH_TIME } from "tweeter-shared";
+import { AuthToken, MAX_AUTH_TIME, UserDTO } from "tweeter-shared";
 import { DAOFactory } from "../../dao/DAOFactory";
 
 export abstract class Service {
@@ -15,7 +15,7 @@ export abstract class Service {
 	 */
 	protected async doAuthenticate(token: string): Promise<void> {
 		if (!(await this.isAuthenticated(token))) {
-			throw new Error("unauthorized");
+			throw new Error("unauthorized: Your session has expired, please log back in.");
 		}
 		const authTokenDAO = this._daoFactory.makeAuthTokenDAO(); // Should you call for a dao every time you need one, or at what point do you make a dao for the entire class?
 		await authTokenDAO.updateAuthorizedTime(token);
@@ -26,10 +26,47 @@ export abstract class Service {
 		const authExpiration = await authTokenDAO.getAuthorizedTime(token);
 
 		if (authExpiration === null) {
-			throw new Error("bad-request"); // Figure out how the error handling works
+			throw new Error("bad-request: Invalid token provided."); // Figure out how the error handling works
 		}
 
 		return Date.now() < authExpiration;
+	}
+
+	protected async getMoreItems<T>(
+		token: string,
+		userAlias: string,
+		pageSize: number,
+		lastItem: T | null,
+		getPage: (alias: string, limit: number, last: T | null) => Promise<[T[], boolean]>,
+		populateItems: (items: T[]) => Promise<void>,
+	): Promise<[T[], boolean]> {
+		this.checkParams(token, userAlias, pageSize);
+		await this.doAuthenticate(token);
+
+		const [items, hasMore] = await getPage(userAlias, pageSize, lastItem);
+		await populateItems(items);
+
+		return [items, hasMore];
+	}
+
+	protected async populateUsers<T>(
+		items: T[],
+		getAlias: (item: T) => string,
+		injectUser: (item: T, user: UserDTO) => void,
+	): Promise<void> {
+		const userDAO = this._daoFactory.makeUserDAO();
+		for (const item of items) {
+			const alias = getAlias(item);
+			const user = await userDAO.findUserByAlias(alias);
+			if (user) {
+				injectUser(item, {
+					firstName: user.firstName,
+					lastName: user.lastName,
+					alias: user.alias,
+					imageURL: user.imageURL,
+				});
+			}
+		}
 	}
 
 	protected checkParams(...params: any[]) {
