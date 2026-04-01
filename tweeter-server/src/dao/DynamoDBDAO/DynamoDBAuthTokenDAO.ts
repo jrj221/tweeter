@@ -18,7 +18,7 @@ export class DynamoDBAuthTokenDAO extends DynamoDBDAO implements AuthTokenDAO {
 		};
 
 		const output = await this._client.send(new GetCommand(params));
-		return output.Item === undefined ? null : Date.now() - output.Item[this._expiresAtAttr];
+		return output.Item === undefined ? null : output.Item[this._expiresAtAttr];
 	}
 
 	async updateAuthorizedTime(token: string): Promise<void> {
@@ -41,7 +41,7 @@ export class DynamoDBAuthTokenDAO extends DynamoDBDAO implements AuthTokenDAO {
 			Item: {
 				[this._tokenAttr]: token,
 				[this._userAliasAttr]: userAlias,
-				[this._expiresAtAttr]: Date.now() + MAX_AUTH_TIME,
+				[this._expiresAtAttr]: expiresAt,
 			},
 		};
 		await this._client.send(new PutCommand(params));

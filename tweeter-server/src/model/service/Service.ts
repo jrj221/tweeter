@@ -14,7 +14,7 @@ export abstract class Service {
 	 * @throws Error if the token is invalid or not in the database
 	 */
 	protected async doAuthenticate(token: string): Promise<void> {
-		if (!this.isAuthenticated(token)) {
+		if (!(await this.isAuthenticated(token))) {
 			throw new Error("unauthorized");
 		}
 		const authTokenDAO = this._daoFactory.makeAuthTokenDAO(); // Should you call for a dao every time you need one, or at what point do you make a dao for the entire class?
@@ -23,11 +23,13 @@ export abstract class Service {
 
 	protected async isAuthenticated(token: string): Promise<boolean> {
 		const authTokenDAO = this._daoFactory.makeAuthTokenDAO();
-		const timeSinceAuth = await authTokenDAO.getAuthorizedTime(token);
-		if (timeSinceAuth === null) {
+		const authExpiration = await authTokenDAO.getAuthorizedTime(token);
+
+		if (authExpiration === null) {
 			throw new Error("bad-request"); // Figure out how the error handling works
 		}
-		return timeSinceAuth < MAX_AUTH_TIME;
+
+		return Date.now() < authExpiration;
 	}
 
 	protected checkParams(...params: any[]) {

@@ -14,7 +14,7 @@ export const handler = async (request: IsFollowerRequest): Promise<IsFollowerRes
 		}
 
 		const isFollower = await followService.getIsFollowerStatus(
-			{ token: request.token, timestamp: Date.now() } as any,
+			request.token,
 			user.alias,
 			selectedUser.alias,
 		);

@@ -51,9 +51,9 @@ class DynamoDBUserDAO extends DynamoDBDAO_1.DynamoDBDAO {
         const params = {
             TableName: this._tableName,
             Key: { [this._aliasAttr]: alias },
-            UpdateExpression: "SET #count = #count + :val",
+            UpdateExpression: "SET #count = if_not_exists(#count, :zero) + :val",
             ExpressionAttributeNames: { "#count": this._followerCountAttr },
-            ExpressionAttributeValues: { ":val": count },
+            ExpressionAttributeValues: { ":val": count, ":zero": 0 },
         };
         await this._client.send(new lib_dynamodb_1.UpdateCommand(params));
     }
@@ -61,9 +61,9 @@ class DynamoDBUserDAO extends DynamoDBDAO_1.DynamoDBDAO {
         const params = {
             TableName: this._tableName,
             Key: { [this._aliasAttr]: alias },
-            UpdateExpression: "SET #count = #count + :val",
+            UpdateExpression: "SET #count = if_not_exists(#count, :zero) + :val",
             ExpressionAttributeNames: { "#count": this._followeeCountAttr },
-            ExpressionAttributeValues: { ":val": count },
+            ExpressionAttributeValues: { ":val": count, ":zero": 0 },
         };
         await this._client.send(new lib_dynamodb_1.UpdateCommand(params));
     }

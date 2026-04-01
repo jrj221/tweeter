@@ -12,7 +12,7 @@ const handler = async (request) => {
         if (!user || !selectedUser) {
             throw new Error("Bad Request: User data is invalid");
         }
-        const isFollower = await followService.getIsFollowerStatus({ token: request.token, timestamp: Date.now() }, user.alias, selectedUser.alias);
+        const isFollower = await followService.getIsFollowerStatus(request.token, user.alias, selectedUser.alias);
         return {
             success: true,
             message: null,

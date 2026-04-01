@@ -44,14 +44,14 @@ class ServerFollowService extends Service_1.Service {
         await this.doAuthenticate(token);
         const userDAO = this._daoFactory.makeUserDAO();
         const user = await userDAO.findUserByAlias(userAlias);
-        return user?.followeeCount ?? 0;
+        return user?.followeeCount ?? -1;
     }
     async getFollowerCount(token, userAlias) {
         this.checkParams(token, userAlias);
         await this.doAuthenticate(token);
         const userDAO = this._daoFactory.makeUserDAO();
         const user = await userDAO.findUserByAlias(userAlias);
-        return user?.followerCount ?? 0;
+        return user?.followerCount ?? -1;
     }
     async follow(token, userAlias, userToFollowAlias) {
         this.checkParams(token, userAlias, userToFollowAlias);
@@ -62,7 +62,7 @@ class ServerFollowService extends Service_1.Service {
         await userDAO.updateFolloweeCount(userAlias, 1);
         await userDAO.updateFollowerCount(userToFollowAlias, 1);
         const followerCount = await this.getFollowerCount(token, userToFollowAlias);
-        const followeeCount = await this.getFolloweeCount(token, userAlias);
+        const followeeCount = await this.getFolloweeCount(token, userToFollowAlias);
         return [followerCount, followeeCount];
     }
     async unfollow(token, userAlias, userToUnfollowAlias) {
@@ -74,7 +74,7 @@ class ServerFollowService extends Service_1.Service {
         await userDAO.updateFolloweeCount(userAlias, -1);
         await userDAO.updateFollowerCount(userToUnfollowAlias, -1);
         const followerCount = await this.getFollowerCount(token, userToUnfollowAlias);
-        const followeeCount = await this.getFolloweeCount(token, userAlias);
+        const followeeCount = await this.getFolloweeCount(token, userToUnfollowAlias);
         return [followerCount, followeeCount];
     }
 }

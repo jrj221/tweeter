@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Service = void 0;
-const tweeter_shared_1 = require("tweeter-shared");
 class Service {
     _daoFactory;
     constructor(daoFactory) {
@@ -13,7 +12,7 @@ class Service {
      * @throws Error if the token is invalid or not in the database
      */
     async doAuthenticate(token) {
-        if (!this.isAuthenticated(token)) {
+        if (!(await this.isAuthenticated(token))) {
             throw new Error("unauthorized");
         }
         const authTokenDAO = this._daoFactory.makeAuthTokenDAO(); // Should you call for a dao every time you need one, or at what point do you make a dao for the entire class?
@@ -21,11 +20,11 @@ class Service {
     }
     async isAuthenticated(token) {
         const authTokenDAO = this._daoFactory.makeAuthTokenDAO();
-        const timeSinceAuth = await authTokenDAO.getAuthorizedTime(token);
-        if (timeSinceAuth === null) {
+        const authExpiration = await authTokenDAO.getAuthorizedTime(token);
+        if (authExpiration === null) {
             throw new Error("bad-request"); // Figure out how the error handling works
         }
-        return timeSinceAuth < tweeter_shared_1.MAX_AUTH_TIME;
+        return Date.now() < authExpiration;
     }
     checkParams(...params) {
         for (const param of params) {
