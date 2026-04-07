@@ -1,5 +1,5 @@
 import { FillFollowTableDao } from "./FillFollowTableDAO";
-import { FillUserTableDao } from "./FillUserTableDao";
+import { FillUserTableDao } from "./FillUserTableDAO";
 import { User } from "tweeter-shared";
 
 // Increase the write capacities for the follow table, follow index, and user table, AND REMEMBER TO DECREASE THEM after running this script
