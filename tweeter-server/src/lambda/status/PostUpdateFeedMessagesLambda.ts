@@ -1,4 +1,4 @@
-import { PostStatusMessage, UserDTO } from "tweeter-shared";
+import { PostStatusMessage, UpdateFeedMessage, UserDTO } from "tweeter-shared";
 import { ServerFollowService } from "../../model/service/ServerFollowService";
 import { DynamoDBDAOFactory } from "../../dao/DynamoDBDAO/DynamoDBFactory";
 import { sendSQSMessage } from "./MessageQueue";
@@ -11,9 +11,10 @@ export const handler = async (message: string) => {
 	for (let i = 0; i < followers.length; i += 400) {
 		const followersSubset = followers.slice(i, i + 400);
 		const message: UpdateFeedMessage = {
-            ""
-        };
-		await sendSQSMessage("", message);
+			followees: followersSubset,
+			statusDTO: postStatusMessage.statusDTO,
+		};
+		await sendSQSMessage("https://sqs.us-east-1.amazonaws.com/735980888276/UpdateFeed", message);
 	}
 };
 
