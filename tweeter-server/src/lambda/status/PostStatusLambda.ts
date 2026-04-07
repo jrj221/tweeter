@@ -1,12 +1,19 @@
-import { PostStatusMessage, PostStatusRequest, PostStatusResponse, Status, StatusDTO } from "tweeter-shared";
+import { PostStatusRequest, PostStatusResponse, Status, StatusDTO } from "tweeter-shared";
 import { ServerStatusService } from "../../model/service/ServerStatusService";
 import { DynamoDBDAOFactory } from "../../dao/DynamoDBDAO/DynamoDBFactory";
-import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+import { sendSQSMessage } from "./MessageQueue";
+import { PostStatusMessage } from "tweeter-shared";
 
 export const handler = async (request: PostStatusRequest): Promise<PostStatusResponse> => {
 	try {
 		addStory(request.newStatus, request.token);
-		messagePostStatusQueue(request.newStatus.user.alias, request.newStatus);
+
+		const message: PostStatusMessage = {
+			followeeAlias: request.newStatus.user.alias,
+			statusDTO: request.newStatus,
+			token: request.token,
+		};
+		await sendSQSMessage("https://sqs.us-east-1.amazonaws.com/735980888276/PostStatus", message);
 
 		return {
 			success: true,
@@ -30,29 +37,4 @@ async function addStory(newStatusDTO: StatusDTO, token: string) {
 	}
 
 	await statusService.addStory(token, newStatus);
-	await messagePostStatusQueue(newStatus.user.alias, newStatusDTO);
-}
-
-async function messagePostStatusQueue(followeeAlias: string, statusDTO: StatusDTO) {
-	let sqsClient = new SQSClient();
-
-	const sqs_url = "https://sqs.us-east-1.amazonaws.com/735980888276/PostStatus";
-	const message: PostStatusMessage = {
-		followeeAlias: followeeAlias,
-		statusDTO: statusDTO,
-	};
-	const messageBody = JSON.stringify(message);
-
-	const params = {
-		DelaySeconds: 10,
-		MessageBody: messageBody,
-		QueueUrl: sqs_url,
-	};
-
-	try {
-		const data = await sqsClient.send(new SendMessageCommand(params));
-		console.log("Success, message sent. MessageID:", data.MessageId);
-	} catch (err) {
-		throw err;
-	}
 }

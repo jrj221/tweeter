@@ -54,4 +54,5 @@ export type { FollowActionResponse } from "./model/net/response/FollowActionResp
 export { FakeData } from "./util/FakeData";
 
 // SQS Messages
+export type { SQSMessage } from "./model/sqs_message/SQSMessage";
 export type { PostStatusMessage } from "./model/sqs_message/PostStatusMessage";
