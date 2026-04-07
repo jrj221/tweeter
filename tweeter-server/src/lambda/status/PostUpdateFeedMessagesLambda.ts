@@ -13,6 +13,7 @@ export const handler = async (message: string) => {
 		const message: UpdateFeedMessage = {
 			followees: followersSubset,
 			statusDTO: postStatusMessage.statusDTO,
+			token: postStatusMessage.token,
 		};
 		await sendSQSMessage("https://sqs.us-east-1.amazonaws.com/735980888276/UpdateFeed", message);
 	}

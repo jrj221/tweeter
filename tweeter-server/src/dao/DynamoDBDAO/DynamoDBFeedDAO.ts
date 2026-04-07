@@ -1,4 +1,4 @@
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, BatchWriteCommand } from "@aws-sdk/lib-dynamodb";
 import { FeedDAO } from "../DAO";
 import { DynamoDBDAO } from "./DynamoDBDAO";
 import { StatusDTO } from "tweeter-shared";
@@ -23,6 +23,31 @@ export class DynamoDBFeedDAO extends DynamoDBDAO implements FeedDAO {
 			},
 		};
 		await this._client.send(new PutCommand(params));
+	}
+
+	/**
+	 * Adds up to 25 feed items to the database in a single batch operation.
+	 */
+	async batchAddFeedItems(followerAliases: string[], status: StatusDTO): Promise<void> {
+		const writeRequests = followerAliases.map((alias) => ({
+			PutRequest: {
+				Item: {
+					[this._followerAliasAttr]: alias,
+					[this._timestampAttr]: status.timestamp,
+					[this._authorAliasAttr]: status.user.alias,
+					[this._postAttr]: status.post,
+					[this._segmentsAttr]: status.segments,
+				},
+			},
+		}));
+
+		const params = {
+			RequestItems: {
+				[this._tableName]: writeRequests,
+			},
+		};
+
+		await this._client.send(new BatchWriteCommand(params));
 	}
 
 	async getPageOfFeedItems(

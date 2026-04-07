@@ -38,6 +38,7 @@ export interface FollowDAO {
 
 export interface FeedDAO {
 	addFeedItem(followerAlias: string, status: StatusDTO): Promise<void>;
+	batchAddFeedItems(followerAliases: string[], status: StatusDTO): Promise<void>;
 	getPageOfFeedItems(
 		followerAlias: string,
 		pageSize: number,

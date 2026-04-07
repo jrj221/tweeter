@@ -52,4 +52,20 @@ export class ServerStatusService extends Service {
 		const statusDAO = this._daoFactory.makeStatusDAO();
 		await statusDAO.addStatus(statusDTO);
 	}
+
+	public async addFeedItem(token: string, newStatus: StatusDTO, followerAlias: string): Promise<void> {
+		this.checkParams(token, newStatus);
+		await this.doAuthenticate(token);
+
+		const feedDAO = this._daoFactory.makeFeedDAO();
+		await feedDAO.addFeedItem(followerAlias, newStatus);
+	}
+
+	public async batchAddFeedItems(token: string, newStatus: StatusDTO, followerAliases: string[]): Promise<void> {
+		this.checkParams(token, newStatus);
+		await this.doAuthenticate(token);
+
+		const feedDAO = this._daoFactory.makeFeedDAO();
+		await feedDAO.batchAddFeedItems(followerAliases, newStatus);
+	}
 }
