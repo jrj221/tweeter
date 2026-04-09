@@ -7,7 +7,9 @@ const DynamoDBFactory_1 = require("../../dao/DynamoDBDAO/DynamoDBFactory");
 const MessageQueue_1 = require("./MessageQueue");
 const handler = async (request) => {
     try {
-        await addStory(request.newStatus, request.token);
+        const statusService = new ServerStatusService_1.ServerStatusService(new DynamoDBFactory_1.DynamoDBDAOFactory());
+        await statusService.doAuthenticate(request.token);
+        await addStory(request.newStatus, request.token, statusService);
         const message = {
             followeeAlias: request.newStatus.user.alias,
             statusDTO: request.newStatus,
@@ -27,11 +29,10 @@ const handler = async (request) => {
     }
 };
 exports.handler = handler;
-async function addStory(newStatusDTO, token) {
-    const statusService = new ServerStatusService_1.ServerStatusService(new DynamoDBFactory_1.DynamoDBDAOFactory());
+async function addStory(newStatusDTO, token, statusService) {
     const newStatus = tweeter_shared_1.Status.fromDTO(newStatusDTO);
     if (!newStatus) {
         throw new Error("Bad Request: Status data is invalid");
     }
-    await statusService.addStory(token, newStatus);
+    await statusService.addStory(token, newStatus, false);
 }

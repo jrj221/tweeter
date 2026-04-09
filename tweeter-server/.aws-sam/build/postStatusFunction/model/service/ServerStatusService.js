@@ -9,9 +9,11 @@ class ServerStatusService extends Service_1.Service {
     async loadMoreStoryItems(token, userAlias, pageSize, lastItem) {
         return await this.getMoreItems(token, userAlias, pageSize, lastItem, (alias, limit, last) => this._daoFactory.makeStatusDAO().getPageOfStatuses(alias, limit, last), (items) => this.populateUsers(items, (item) => item.user.alias, (item, user) => Object.assign(item, { user })));
     }
-    async addStory(token, newStatus) {
+    async addStory(token, newStatus, authenticate = true) {
         this.checkParams(token, newStatus);
-        await this.doAuthenticate(token);
+        if (authenticate) {
+            await this.doAuthenticate(token);
+        }
         const statusDTO = newStatus.DTO;
         const statusDAO = this._daoFactory.makeStatusDAO();
         await statusDAO.addStatus(statusDTO);

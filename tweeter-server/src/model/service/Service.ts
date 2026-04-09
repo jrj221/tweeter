@@ -13,7 +13,7 @@ export abstract class Service {
 	 * @param token The token to authenticate
 	 * @throws Error if the token is invalid or not in the database
 	 */
-	protected async doAuthenticate(token: string): Promise<void> {
+	public async doAuthenticate(token: string): Promise<void> {
 		if (!(await this.isAuthenticated(token))) {
 			throw new Error("unauthorized: Your session has expired, please log back in.");
 		}

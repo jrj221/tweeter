@@ -6,7 +6,10 @@ import { PostStatusMessage } from "tweeter-shared";
 
 export const handler = async (request: PostStatusRequest): Promise<PostStatusResponse> => {
 	try {
-		await addStory(request.newStatus, request.token);
+		const statusService = new ServerStatusService(new DynamoDBDAOFactory());
+		await statusService.doAuthenticate(request.token);
+
+		await addStory(request.newStatus, request.token, statusService);
 
 		const message: PostStatusMessage = {
 			followeeAlias: request.newStatus.user.alias,
@@ -27,14 +30,12 @@ export const handler = async (request: PostStatusRequest): Promise<PostStatusRes
 	}
 };
 
-async function addStory(newStatusDTO: StatusDTO, token: string) {
-	const statusService = new ServerStatusService(new DynamoDBDAOFactory());
-
+async function addStory(newStatusDTO: StatusDTO, token: string, statusService: ServerStatusService) {
 	const newStatus = Status.fromDTO(newStatusDTO);
 
 	if (!newStatus) {
 		throw new Error("Bad Request: Status data is invalid");
 	}
 
-	await statusService.addStory(token, newStatus);
+	await statusService.addStory(token, newStatus, false);
 }

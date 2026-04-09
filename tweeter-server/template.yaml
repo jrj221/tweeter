@@ -608,7 +608,7 @@ Resources:
     #         Projection:
     #           ProjectionType: ALL
 
-    # followTable:  ##### TODO: Change to match the table name
+    # followTable:  ##### TODO: Change to maatch the table name
     #   Type: AWS::DynamoDB::Table
     #   Properties:
     #     TableName: follow  ##### TODO: Set the actual table name
@@ -628,7 +628,7 @@ Resources:
     #       ReadCapacityUnits: 1
     #       WriteCapacityUnits: 1
     #     GlobalSecondaryIndexes:
-    #       - IndexName: follow_index  ##### TODO: Set the actual index name
+    #       - IndexName: followee_index  ##### Matches the name in DynamoDBFollowDAO.ts
     #         KeySchema:
     #           - AttributeName: followee_alias  ##### TODO: Set index partition key
     #             KeyType: HASH
@@ -657,4 +657,4 @@ Resources:
             BillingMode: PROVISIONED
             ProvisionedThroughput:
                 ReadCapacityUnits: 1
-                WriteCapacityUnits: 1
+                WriteCapacityUnits: 100

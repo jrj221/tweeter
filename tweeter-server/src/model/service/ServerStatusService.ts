@@ -44,9 +44,11 @@ export class ServerStatusService extends Service {
 		);
 	}
 
-	public async addStory(token: string, newStatus: Status): Promise<void> {
+	public async addStory(token: string, newStatus: Status, authenticate: boolean = true): Promise<void> {
 		this.checkParams(token, newStatus);
-		await this.doAuthenticate(token);
+		if (authenticate) {
+			await this.doAuthenticate(token);
+		}
 
 		const statusDTO = newStatus.DTO;
 		const statusDAO = this._daoFactory.makeStatusDAO();
