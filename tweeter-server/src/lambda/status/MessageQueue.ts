@@ -7,7 +7,7 @@ export async function sendSQSMessage(sqsURL: string, message: SQSMessage) {
 	const messageBody = JSON.stringify(message);
 
 	const params = {
-		DelaySeconds: 10,
+		DelaySeconds: 0, // Changed from 10
 		MessageBody: messageBody,
 		QueueUrl: sqsURL,
 	};
@@ -26,7 +26,7 @@ export async function sendSQSMessageBatch(sqsURL: string, messages: SQSMessage[]
 		Entries: messages.map((message, index) => ({
 			Id: index.toString(),
 			MessageBody: JSON.stringify(message),
-			DelaySeconds: 10,
+			DelaySeconds: 0, // Changed from 10
 		})),
 	};
 

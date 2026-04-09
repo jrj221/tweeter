@@ -7,7 +7,7 @@ const sqsClient = new client_sqs_1.SQSClient();
 async function sendSQSMessage(sqsURL, message) {
     const messageBody = JSON.stringify(message);
     const params = {
-        DelaySeconds: 10,
+        DelaySeconds: 0, // Changed from 10
         MessageBody: messageBody,
         QueueUrl: sqsURL,
     };
@@ -25,7 +25,7 @@ async function sendSQSMessageBatch(sqsURL, messages) {
         Entries: messages.map((message, index) => ({
             Id: index.toString(),
             MessageBody: JSON.stringify(message),
-            DelaySeconds: 10,
+            DelaySeconds: 0, // Changed from 10
         })),
     };
     try {

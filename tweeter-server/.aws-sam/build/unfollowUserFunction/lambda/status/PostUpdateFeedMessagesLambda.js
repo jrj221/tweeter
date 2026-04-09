@@ -13,7 +13,6 @@ const handler = async (event) => {
             const postStatusMessage = JSON.parse(record.body);
             let lastFollowerAlias = null;
             let hasMoreFollowers = true;
-            const sqsBatch = [];
             while (hasMoreFollowers) {
                 const [newFollowerAliases, more] = await followService.loadMoreFollowerAliases(postStatusMessage.token, postStatusMessage.followeeAlias, 100, lastFollowerAlias, false);
                 hasMoreFollowers = more;
@@ -24,15 +23,8 @@ const handler = async (event) => {
                         statusDTO: postStatusMessage.statusDTO,
                         token: postStatusMessage.token,
                     };
-                    sqsBatch.push(message);
-                    if (sqsBatch.length === 10) {
-                        await (0, MessageQueue_1.sendSQSMessageBatch)(url, sqsBatch);
-                        sqsBatch.length = 0;
-                    }
+                    await (0, MessageQueue_1.sendSQSMessage)(url, message);
                 }
-            }
-            if (sqsBatch.length > 0) {
-                await (0, MessageQueue_1.sendSQSMessageBatch)(url, sqsBatch);
             }
         }
     }
