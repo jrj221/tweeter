@@ -1303,21 +1303,3 @@ Resources:
       CodeUri: updateFeedsFunction
     Metadata:
       SamResourceId: updateFeedsFunction
-  feedTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: feed
-      AttributeDefinitions:
-      - AttributeName: followerAlias
-        AttributeType: S
-      - AttributeName: timestamp
-        AttributeType: N
-      KeySchema:
-      - AttributeName: followerAlias
-        KeyType: HASH
-      - AttributeName: timestamp
-        KeyType: RANGE
-      BillingMode: PROVISIONED
-      ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 100

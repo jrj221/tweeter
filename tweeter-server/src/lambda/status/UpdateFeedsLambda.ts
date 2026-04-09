@@ -4,8 +4,10 @@ import { ServerStatusService } from "../../model/service/ServerStatusService";
 import { DynamoDBDAOFactory } from "../../dao/DynamoDBDAO/DynamoDBFactory";
 
 export const handler = async (event: SQSEvent) => {
+	// console.log("Reached UpdateFeedLambda");
 	try {
 		for (const record of event.Records) {
+			// console.log("In a record");
 			// Based on configured batch size
 			const updateFeedMessage: UpdateFeedMessage = JSON.parse(record.body); // More typechecking?
 
@@ -14,15 +16,10 @@ export const handler = async (event: SQSEvent) => {
 				const startTimeMilllis = Date.now();
 
 				for (let j = 0; j < 4; j++) {
-					const followerBatch = updateFeedMessage.followerAliases.slice(
-						i + j * 25,
-						i + (j + 1) * 25,
-					);
+					const followerBatch = updateFeedMessage.followerAliases.slice(i + j * 25, i + (j + 1) * 25);
 					if (followerBatch.length > 0) {
-						await statusService.batchAddFeedItemsInternal(
-							updateFeedMessage.statusDTO,
-							followerBatch,
-						);
+						// console.log("Sending a batch feed write");
+						await statusService.batchAddFeedItemsInternal(updateFeedMessage.statusDTO, followerBatch);
 					}
 				}
 
@@ -32,6 +29,7 @@ export const handler = async (event: SQSEvent) => {
 				}
 			}
 		}
+		// console.log("finishing lambda");
 	} catch (error) {
 		console.error("Error updating feeds:", (error as Error).message);
 		throw error;

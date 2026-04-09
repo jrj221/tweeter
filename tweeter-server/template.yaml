@@ -567,7 +567,7 @@ Resources:
                     Type: SQS
                     Properties:
                         Queue: arn:aws:sqs:us-east-1:735980888276:UpdateFeed
-                        BatchSize: 5
+                        BatchSize: 1
                         Enabled: true
 
     #
@@ -640,21 +640,21 @@ Resources:
     #         Projection:
     #           ProjectionType: ALL
 
-    feedTable:
-        Type: AWS::DynamoDB::Table
-        Properties:
-            TableName: feed
-            AttributeDefinitions:
-                - AttributeName: followerAlias
-                  AttributeType: S
-                - AttributeName: timestamp
-                  AttributeType: N
-            KeySchema:
-                - AttributeName: followerAlias
-                  KeyType: HASH
-                - AttributeName: timestamp
-                  KeyType: RANGE
-            BillingMode: PROVISIONED
-            ProvisionedThroughput:
-                ReadCapacityUnits: 1
-                WriteCapacityUnits: 100
+    # feedTable:
+    #     Type: AWS::DynamoDB::Table
+    #     Properties:
+    #         TableName: feed
+    #         AttributeDefinitions:
+    #             - AttributeName: followerAlias
+    #               AttributeType: S
+    #             - AttributeName: timestamp
+    #               AttributeType: N
+    #         KeySchema:
+    #             - AttributeName: followerAlias
+    #               KeyType: HASH
+    #             - AttributeName: timestamp
+    #               KeyType: RANGE
+    #         BillingMode: PROVISIONED
+    #         ProvisionedThroughput:
+    #             ReadCapacityUnits: 1
+    #             WriteCapacityUnits: 100

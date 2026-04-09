@@ -28,7 +28,7 @@ import {
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
-	private SERVER_URL = "https://zebl720pcc.execute-api.us-east-1.amazonaws.com/prod"; // From API Gateway prod stage
+	private SERVER_URL = "https://3ovjnt5n53.execute-api.us-east-1.amazonaws.com/prod"; // From API Gateway prod stage
 
 	private clientCommunicator = new ClientCommunicator(this.SERVER_URL);
 
