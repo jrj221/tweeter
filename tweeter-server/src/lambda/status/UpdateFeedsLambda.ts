@@ -5,8 +5,7 @@ import { DynamoDBDAOFactory } from "../../dao/DynamoDBDAO/DynamoDBFactory";
 
 export const handler = async (event: SQSEvent) => {
 	try {
-		if (event.Records.length > 0) {
-			const record = event.Records[0];
+		for (const record of event.Records) {
 			// Based on configured batch size
 			const updateFeedMessage: UpdateFeedMessage = JSON.parse(record.body); // More typechecking?
 

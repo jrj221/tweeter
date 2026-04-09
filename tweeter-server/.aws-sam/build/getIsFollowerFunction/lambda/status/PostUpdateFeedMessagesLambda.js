@@ -10,6 +10,8 @@ const handler = async (event) => {
             // Based on configured batch size
             const postStatusMessage = JSON.parse(record.body); // More typechecking?
             const followers = await getAllFollowers(postStatusMessage.followeeAlias, postStatusMessage.token);
+            const url = "https://sqs.us-east-1.amazonaws.com/735980888276/UpdateFeed";
+            const messages = [];
             for (let i = 0; i < followers.length; i += 400) {
                 const followersSubset = followers.slice(i, i + 400);
                 const message = {
@@ -17,7 +19,14 @@ const handler = async (event) => {
                     statusDTO: postStatusMessage.statusDTO,
                     token: postStatusMessage.token,
                 };
-                await (0, MessageQueue_1.sendSQSMessage)("https://sqs.us-east-1.amazonaws.com/735980888276/UpdateFeed", message);
+                messages.push(message);
+                if (messages.length === 10) {
+                    await (0, MessageQueue_1.sendSQSMessageBatch)(url, messages);
+                    messages.length = 0;
+                }
+            }
+            if (messages.length > 0) {
+                await (0, MessageQueue_1.sendSQSMessageBatch)(url, messages);
             }
         }
     }

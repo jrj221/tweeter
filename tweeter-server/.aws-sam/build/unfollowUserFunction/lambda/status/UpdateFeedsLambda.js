@@ -5,8 +5,7 @@ const ServerStatusService_1 = require("../../model/service/ServerStatusService")
 const DynamoDBFactory_1 = require("../../dao/DynamoDBDAO/DynamoDBFactory");
 const handler = async (event) => {
     try {
-        if (event.Records.length > 0) {
-            const record = event.Records[0];
+        for (const record of event.Records) {
             // Based on configured batch size
             const updateFeedMessage = JSON.parse(record.body); // More typechecking?
             const statusService = new ServerStatusService_1.ServerStatusService(new DynamoDBFactory_1.DynamoDBDAOFactory());
