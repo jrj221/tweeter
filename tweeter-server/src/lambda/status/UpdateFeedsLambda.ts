@@ -19,8 +19,7 @@ export const handler = async (event: SQSEvent) => {
 						i + (j + 1) * 25,
 					);
 					if (followerBatch.length > 0) {
-						await statusService.batchAddFeedItems(
-							updateFeedMessage.token,
+						await statusService.batchAddFeedItemsInternal(
 							updateFeedMessage.statusDTO,
 							followerBatch,
 						);

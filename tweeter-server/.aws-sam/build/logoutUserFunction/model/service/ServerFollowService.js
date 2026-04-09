@@ -9,8 +9,8 @@ class ServerFollowService extends Service_1.Service {
     async loadMoreFollowers(token, userAlias, pageSize, lastItem) {
         return await this.getMoreItems(token, userAlias, pageSize, lastItem, (alias, limit, last) => this._daoFactory.makeFollowDAO().getPageOfFollowers(alias, limit, last), (items) => this.populateUsers(items, (item) => item.alias, Object.assign));
     }
-    async loadMoreFollowerAliases(token, userAlias, pageSize, lastItemAlias) {
-        return await this.getMoreItems(token, userAlias, pageSize, lastItemAlias, (alias, limit, last) => this._daoFactory.makeFollowDAO().getPageOfFollowerAliases(alias, limit, last), async () => { });
+    async loadMoreFollowerAliases(token, userAlias, pageSize, lastItemAlias, authenticate = true) {
+        return await this.getMoreItems(token, userAlias, pageSize, lastItemAlias, (alias, limit, last) => this._daoFactory.makeFollowDAO().getPageOfFollowerAliases(alias, limit, last), async () => { }, authenticate);
     }
     async getIsFollowerStatus(token, userAlias, selectedUserAlias) {
         this.checkParams(token, userAlias, selectedUserAlias);

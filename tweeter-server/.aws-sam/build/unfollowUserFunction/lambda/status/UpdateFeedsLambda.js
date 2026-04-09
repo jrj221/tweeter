@@ -14,7 +14,7 @@ const handler = async (event) => {
                 for (let j = 0; j < 4; j++) {
                     const followerBatch = updateFeedMessage.followerAliases.slice(i + j * 25, i + (j + 1) * 25);
                     if (followerBatch.length > 0) {
-                        await statusService.batchAddFeedItems(updateFeedMessage.token, updateFeedMessage.statusDTO, followerBatch);
+                        await statusService.batchAddFeedItemsInternal(updateFeedMessage.statusDTO, followerBatch);
                     }
                 }
                 const elapsedTimeMillis = Date.now() - startTimeMilllis;

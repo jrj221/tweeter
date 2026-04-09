@@ -39,9 +39,12 @@ export abstract class Service {
 		lastItem: T | null,
 		getPage: (alias: string, limit: number, last: T | null) => Promise<[T[], boolean]>,
 		populateItems: (items: T[]) => Promise<void>,
+		authenticate: boolean = true,
 	): Promise<[T[], boolean]> {
 		this.checkParams(token, userAlias, pageSize);
-		await this.doAuthenticate(token);
+		if (authenticate) {
+			await this.doAuthenticate(token);
+		}
 
 		const [items, hasMore] = await getPage(userAlias, pageSize, lastItem);
 		await populateItems(items);

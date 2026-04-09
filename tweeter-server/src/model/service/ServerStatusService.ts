@@ -61,10 +61,8 @@ export class ServerStatusService extends Service {
 		await feedDAO.addFeedItem(followerAlias, newStatus);
 	}
 
-	public async batchAddFeedItems(token: string, newStatus: StatusDTO, followerAliases: string[]): Promise<void> {
-		this.checkParams(token, newStatus);
-		await this.doAuthenticate(token);
-
+	// Doesn't require authentication because you already authenticated when you posted
+	public async batchAddFeedItemsInternal(newStatus: StatusDTO, followerAliases: string[]): Promise<void> {
 		const feedDAO = this._daoFactory.makeFeedDAO();
 		await feedDAO.batchAddFeedItems(followerAliases, newStatus);
 	}

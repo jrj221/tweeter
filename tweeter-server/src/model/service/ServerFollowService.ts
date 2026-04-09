@@ -38,6 +38,7 @@ export class ServerFollowService extends Service {
 		userAlias: string,
 		pageSize: number,
 		lastItemAlias: string | null,
+		authenticate: boolean = true,
 	): Promise<[string[], boolean]> {
 		return await this.getMoreItems(
 			token,
@@ -47,6 +48,7 @@ export class ServerFollowService extends Service {
 			(alias, limit, last) =>
 				this._daoFactory.makeFollowDAO().getPageOfFollowerAliases(alias, limit, last),
 			async () => {},
+			authenticate,
 		);
 	}
 

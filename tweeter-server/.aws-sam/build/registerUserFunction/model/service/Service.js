@@ -26,9 +26,11 @@ class Service {
         }
         return Date.now() < authExpiration;
     }
-    async getMoreItems(token, userAlias, pageSize, lastItem, getPage, populateItems) {
+    async getMoreItems(token, userAlias, pageSize, lastItem, getPage, populateItems, authenticate = true) {
         this.checkParams(token, userAlias, pageSize);
-        await this.doAuthenticate(token);
+        if (authenticate) {
+            await this.doAuthenticate(token);
+        }
         const [items, hasMore] = await getPage(userAlias, pageSize, lastItem);
         await populateItems(items);
         return [items, hasMore];

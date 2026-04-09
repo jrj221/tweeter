@@ -42,7 +42,7 @@ async function getAllFollowers(followeeAlias, token) {
     let lastFollowerAlias = null;
     let hasMoreFollowers = true;
     while (hasMoreFollowers) {
-        const [newFollowerAliases, more] = await followService.loadMoreFollowerAliases(token, followeeAlias, 100, lastFollowerAlias);
+        const [newFollowerAliases, more] = await followService.loadMoreFollowerAliases(token, followeeAlias, 100, lastFollowerAlias, false);
         followers.push(...newFollowerAliases);
         hasMoreFollowers = more;
         if (newFollowerAliases.length > 0) {

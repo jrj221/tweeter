@@ -53,6 +53,7 @@ async function getAllFollowers(followeeAlias: string, token: string): Promise<st
 			followeeAlias,
 			100,
 			lastFollowerAlias,
+			false, // Bypassing redundant authentication for background task
 		);
 		followers.push(...newFollowerAliases);
 		hasMoreFollowers = more;
