@@ -2,7 +2,7 @@ import { SQSEvent } from "aws-lambda";
 import { PostStatusMessage, UpdateFeedMessage } from "tweeter-shared";
 import { ServerFollowService } from "../../model/service/ServerFollowService";
 import { DynamoDBDAOFactory } from "../../dao/DynamoDBDAO/DynamoDBFactory";
-import { sendSQSMessage } from "./MessageQueue";
+import { sendSQSMessageBatch } from "./MessageQueue";
 
 export const handler = async (event: SQSEvent) => {
 	try {
@@ -16,14 +16,17 @@ export const handler = async (event: SQSEvent) => {
 			let lastFollowerAlias: string | null = null;
 			let hasMoreFollowers = true;
 
+			const sqsBatch: UpdateFeedMessage[] = [];
+
 			while (hasMoreFollowers) {
-				const [newFollowerAliases, more]: [string[], boolean] = await followService.loadMoreFollowerAliases(
-					postStatusMessage.token,
-					postStatusMessage.followeeAlias,
-					100,
-					lastFollowerAlias,
-					false, // Bypassing redundant authentication
-				);
+				const [newFollowerAliases, more]: [string[], boolean] =
+					await followService.loadMoreFollowerAliases(
+						postStatusMessage.token,
+						postStatusMessage.followeeAlias,
+						100,
+						lastFollowerAlias,
+						false, // Bypassing redundant authentication
+					);
 
 				hasMoreFollowers = more;
 
@@ -36,8 +39,17 @@ export const handler = async (event: SQSEvent) => {
 						token: postStatusMessage.token,
 					};
 
-					await sendSQSMessage(url, message);
+					sqsBatch.push(message);
+
+					if (sqsBatch.length === 10) {
+						await sendSQSMessageBatch(url, sqsBatch);
+						sqsBatch.length = 0;
+					}
 				}
+			}
+
+			if (sqsBatch.length > 0) {
+				await sendSQSMessageBatch(url, sqsBatch);
 			}
 		}
 	} catch (error) {
