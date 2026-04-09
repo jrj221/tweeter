@@ -16,18 +16,17 @@ class ServerFollowService extends Service_1.Service {
         return await followDAO.getIsFollower(userAlias, selectedUserAlias);
     }
     async getFolloweeCount(token, userAlias) {
-        this.checkParams(token, userAlias);
-        await this.doAuthenticate(token);
-        const userDAO = this._daoFactory.makeUserDAO();
-        const user = await userDAO.findUserByAlias(userAlias);
-        return user?.followeeCount ?? -1;
+        return this.getCount(token, userAlias, "followeeCount");
     }
     async getFollowerCount(token, userAlias) {
+        return this.getCount(token, userAlias, "followerCount");
+    }
+    async getCount(token, userAlias, countType) {
         this.checkParams(token, userAlias);
         await this.doAuthenticate(token);
         const userDAO = this._daoFactory.makeUserDAO();
         const user = await userDAO.findUserByAlias(userAlias);
-        return user?.followerCount ?? -1;
+        return user?.[countType] ?? -1;
     }
     async follow(token, userAlias, userToFollowAlias) {
         return await this.doFollowAction(token, userAlias, userToFollowAlias, true);

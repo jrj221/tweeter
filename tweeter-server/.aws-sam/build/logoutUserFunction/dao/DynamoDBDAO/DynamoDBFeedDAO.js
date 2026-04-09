@@ -23,6 +23,28 @@ class DynamoDBFeedDAO extends DynamoDBDAO_1.DynamoDBDAO {
         };
         await this._client.send(new lib_dynamodb_1.PutCommand(params));
     }
+    /**
+     * Adds up to 25 feed items to the database in a single batch operation.
+     */
+    async batchAddFeedItems(followerAliases, status) {
+        const writeRequests = followerAliases.map((alias) => ({
+            PutRequest: {
+                Item: {
+                    [this._followerAliasAttr]: alias,
+                    [this._timestampAttr]: status.timestamp,
+                    [this._authorAliasAttr]: status.user.alias,
+                    [this._postAttr]: status.post,
+                    [this._segmentsAttr]: status.segments,
+                },
+            },
+        }));
+        const params = {
+            RequestItems: {
+                [this._tableName]: writeRequests,
+            },
+        };
+        await this._client.send(new lib_dynamodb_1.BatchWriteCommand(params));
+    }
     async getPageOfFeedItems(followerAlias, pageSize, lastItem) {
         const [items, hasMore] = await this.getPage({
             TableName: this._tableName,

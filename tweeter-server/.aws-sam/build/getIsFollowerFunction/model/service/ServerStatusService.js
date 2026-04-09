@@ -9,26 +9,24 @@ class ServerStatusService extends Service_1.Service {
     async loadMoreStoryItems(token, userAlias, pageSize, lastItem) {
         return await this.getMoreItems(token, userAlias, pageSize, lastItem, (alias, limit, last) => this._daoFactory.makeStatusDAO().getPageOfStatuses(alias, limit, last), (items) => this.populateUsers(items, (item) => item.user.alias, (item, user) => Object.assign(item, { user })));
     }
-    async postStatus(token, newStatus) {
+    async addStory(token, newStatus) {
         this.checkParams(token, newStatus);
         await this.doAuthenticate(token);
         const statusDTO = newStatus.DTO;
         const statusDAO = this._daoFactory.makeStatusDAO();
         await statusDAO.addStatus(statusDTO);
-        const followDAO = this._daoFactory.makeFollowDAO();
+    }
+    async addFeedItem(token, newStatus, followerAlias) {
+        this.checkParams(token, newStatus);
+        await this.doAuthenticate(token);
         const feedDAO = this._daoFactory.makeFeedDAO();
-        let lastFollower = null;
-        let hasMoreFollowers = true;
-        while (hasMoreFollowers) {
-            const [followers, more] = await followDAO.getPageOfFollowers(statusDTO.user.alias, 100, lastFollower);
-            for (const follower of followers) {
-                await feedDAO.addFeedItem(follower.alias, statusDTO);
-            }
-            hasMoreFollowers = more;
-            if (followers.length > 0) {
-                lastFollower = followers[followers.length - 1];
-            }
-        }
+        await feedDAO.addFeedItem(followerAlias, newStatus);
+    }
+    async batchAddFeedItems(token, newStatus, followerAliases) {
+        this.checkParams(token, newStatus);
+        await this.doAuthenticate(token);
+        const feedDAO = this._daoFactory.makeFeedDAO();
+        await feedDAO.batchAddFeedItems(followerAliases, newStatus);
     }
 }
 exports.ServerStatusService = ServerStatusService;
