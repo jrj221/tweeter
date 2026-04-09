@@ -16,30 +16,25 @@ export const handler = async (event: SQSEvent) => {
 			let lastFollowerAlias: string | null = null;
 			let hasMoreFollowers = true;
 
-			const followerBuffer: string[] = [];
 			const sqsBatch: UpdateFeedMessage[] = [];
 
 			while (hasMoreFollowers) {
-				const [newFollowerAliases, more]: [string[], boolean] = await followService.loadMoreFollowerAliases(
-					postStatusMessage.token,
-					postStatusMessage.followeeAlias,
-					100,
-					lastFollowerAlias,
-					false, // Bypassing redundant authentication
-				);
+				const [newFollowerAliases, more]: [string[], boolean] =
+					await followService.loadMoreFollowerAliases(
+						postStatusMessage.token,
+						postStatusMessage.followeeAlias,
+						100,
+						lastFollowerAlias,
+						false, // Bypassing redundant authentication
+					);
 
 				hasMoreFollowers = more;
-				followerBuffer.push(...newFollowerAliases);
 
 				if (newFollowerAliases.length > 0) {
 					lastFollowerAlias = newFollowerAliases[newFollowerAliases.length - 1];
-				}
 
-				// Process full groups of 400 from the buffer
-				while (followerBuffer.length >= 400) {
-					const followersSubset = followerBuffer.splice(0, 400);
 					const message: UpdateFeedMessage = {
-						followerAliases: followersSubset,
+						followerAliases: newFollowerAliases,
 						statusDTO: postStatusMessage.statusDTO,
 						token: postStatusMessage.token,
 					};
@@ -50,16 +45,6 @@ export const handler = async (event: SQSEvent) => {
 						sqsBatch.length = 0;
 					}
 				}
-			}
-
-			// After all pages for this record, handle leftovers
-			if (followerBuffer.length > 0) {
-				const message: UpdateFeedMessage = {
-					followerAliases: followerBuffer,
-					statusDTO: postStatusMessage.statusDTO,
-					token: postStatusMessage.token,
-				};
-				sqsBatch.push(message);
 			}
 
 			if (sqsBatch.length > 0) {

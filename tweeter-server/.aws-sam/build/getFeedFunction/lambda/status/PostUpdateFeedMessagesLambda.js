@@ -13,20 +13,14 @@ const handler = async (event) => {
             const postStatusMessage = JSON.parse(record.body);
             let lastFollowerAlias = null;
             let hasMoreFollowers = true;
-            const followerBuffer = [];
             const sqsBatch = [];
             while (hasMoreFollowers) {
                 const [newFollowerAliases, more] = await followService.loadMoreFollowerAliases(postStatusMessage.token, postStatusMessage.followeeAlias, 100, lastFollowerAlias, false);
                 hasMoreFollowers = more;
-                followerBuffer.push(...newFollowerAliases);
                 if (newFollowerAliases.length > 0) {
                     lastFollowerAlias = newFollowerAliases[newFollowerAliases.length - 1];
-                }
-                // Process full groups of 400 from the buffer
-                while (followerBuffer.length >= 400) {
-                    const followersSubset = followerBuffer.splice(0, 400);
                     const message = {
-                        followerAliases: followersSubset,
+                        followerAliases: newFollowerAliases,
                         statusDTO: postStatusMessage.statusDTO,
                         token: postStatusMessage.token,
                     };
@@ -36,15 +30,6 @@ const handler = async (event) => {
                         sqsBatch.length = 0;
                     }
                 }
-            }
-            // After all pages for this record, handle leftovers
-            if (followerBuffer.length > 0) {
-                const message = {
-                    followerAliases: followerBuffer,
-                    statusDTO: postStatusMessage.statusDTO,
-                    token: postStatusMessage.token,
-                };
-                sqsBatch.push(message);
             }
             if (sqsBatch.length > 0) {
                 await (0, MessageQueue_1.sendSQSMessageBatch)(url, sqsBatch);
