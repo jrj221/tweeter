@@ -1259,3 +1259,45 @@ Resources:
       CodeUri: logoutUserFunction
     Metadata:
       SamResourceId: logoutUserFunction
+  postUpdateFeedMessagesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: postUpdateFeedMessagesFunction
+      Handler: lambda/status/PostUpdateFeedMessagesLambda.handler
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - AmazonSESFullAccess
+      - CloudWatchFullAccess
+      - AmazonDynamoDBFullAccess
+      - AmazonS3FullAccess
+      - AmazonSQSFullAccess
+      Events:
+        SQSTrigger:
+          Type: SQS
+          Properties:
+            Queue: arn:aws:sqs:us-east-1:735980888276:PostStatus
+            Enabled: true
+      CodeUri: postUpdateFeedMessagesFunction
+    Metadata:
+      SamResourceId: postUpdateFeedMessagesFunction
+  updateFeedsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: updateFeedsFunction
+      Handler: lambda/status/UpdateFeedsLambda.handler
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - AmazonSESFullAccess
+      - CloudWatchFullAccess
+      - AmazonDynamoDBFullAccess
+      - AmazonS3FullAccess
+      - AmazonSQSFullAccess
+      Events:
+        SQSTrigger:
+          Type: SQS
+          Properties:
+            Queue: arn:aws:sqs:us-east-1:735980888276:UpdateFeed
+            Enabled: true
+      CodeUri: updateFeedsFunction
+    Metadata:
+      SamResourceId: updateFeedsFunction

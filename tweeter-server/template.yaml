@@ -539,21 +539,34 @@ Resources:
                         Method: POST
 
     #
-    # SQS Queue Lambda Functions  (This will become relevant in Milestone 4. For M3, leave this section commented out.)
+    # SQS Queue Lambda Functions
     #
 
-    #   MyQueueFunction:
-    #     Type: AWS::Serverless::Function
-    #     Properties:
-    #       FunctionName: MyQueueFunction
-    #       Handler: <PATH TO LAMBDA HANDLER>
-    #       Policies: *commonPolicies
-    #       Events:
-    #         SQSTrigger:
-    #           Type: SQS
-    #           Properties:
-    #             Queue: !GetAtt MyQueue.Arn
-    #             Enabled: true
+    postUpdateFeedMessagesFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: postUpdateFeedMessagesFunction
+            Handler: lambda/status/PostUpdateFeedMessagesLambda.handler
+            Policies: *commonPolicies
+            Events:
+                SQSTrigger:
+                    Type: SQS
+                    Properties:
+                        Queue: arn:aws:sqs:us-east-1:735980888276:PostStatus
+                        Enabled: true
+
+    updateFeedsFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: updateFeedsFunction
+            Handler: lambda/status/UpdateFeedsLambda.handler
+            Policies: *commonPolicies
+            Events:
+                SQSTrigger:
+                    Type: SQS
+                    Properties:
+                        Queue: arn:aws:sqs:us-east-1:735980888276:UpdateFeed
+                        Enabled: true
 
     #
     # DynamoDB Tables
