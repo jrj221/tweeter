@@ -6,7 +6,7 @@ import { PostStatusMessage } from "tweeter-shared";
 
 export const handler = async (request: PostStatusRequest): Promise<PostStatusResponse> => {
 	try {
-		addStory(request.newStatus, request.token);
+		await addStory(request.newStatus, request.token);
 
 		const message: PostStatusMessage = {
 			followeeAlias: request.newStatus.user.alias,

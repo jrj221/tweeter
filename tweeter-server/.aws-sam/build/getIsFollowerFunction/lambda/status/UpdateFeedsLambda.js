@@ -4,7 +4,8 @@ exports.handler = void 0;
 const ServerStatusService_1 = require("../../model/service/ServerStatusService");
 const DynamoDBFactory_1 = require("../../dao/DynamoDBDAO/DynamoDBFactory");
 const handler = async (event) => {
-    for (const record of event.Records) {
+    if (event.Records.length > 0) {
+        const record = event.Records[0];
         // Based on configured batch size
         const updateFeedMessage = JSON.parse(record.body); // More typechecking?
         const statusService = new ServerStatusService_1.ServerStatusService(new DynamoDBFactory_1.DynamoDBDAOFactory());
@@ -15,7 +16,7 @@ const handler = async (event) => {
                 await statusService.batchAddFeedItems(updateFeedMessage.token, updateFeedMessage.statusDTO, followerBatch);
             }
             const elapsedTimeMillis = Date.now() - startTimeMilllis;
-            if (elapsedTimeMillis > 1000) {
+            if (elapsedTimeMillis < 1000) {
                 await new Promise((resolve) => setTimeout(resolve, 1000 - elapsedTimeMillis));
             }
         }

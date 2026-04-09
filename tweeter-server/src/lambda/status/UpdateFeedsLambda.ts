@@ -4,7 +4,8 @@ import { ServerStatusService } from "../../model/service/ServerStatusService";
 import { DynamoDBDAOFactory } from "../../dao/DynamoDBDAO/DynamoDBFactory";
 
 export const handler = async (event: SQSEvent) => {
-	for (const record of event.Records) {
+	if (event.Records.length > 0) {
+		const record = event.Records[0];
 		// Based on configured batch size
 		const updateFeedMessage: UpdateFeedMessage = JSON.parse(record.body); // More typechecking?
 
@@ -22,7 +23,7 @@ export const handler = async (event: SQSEvent) => {
 			}
 
 			const elapsedTimeMillis = Date.now() - startTimeMilllis;
-			if (elapsedTimeMillis > 1000) {
+			if (elapsedTimeMillis < 1000) {
 				await new Promise((resolve) => setTimeout(resolve, 1000 - elapsedTimeMillis));
 			}
 		}

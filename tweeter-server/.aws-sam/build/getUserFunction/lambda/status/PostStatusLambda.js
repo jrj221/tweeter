@@ -7,7 +7,7 @@ const DynamoDBFactory_1 = require("../../dao/DynamoDBDAO/DynamoDBFactory");
 const MessageQueue_1 = require("./MessageQueue");
 const handler = async (request) => {
     try {
-        addStory(request.newStatus, request.token);
+        await addStory(request.newStatus, request.token);
         const message = {
             followeeAlias: request.newStatus.user.alias,
             statusDTO: request.newStatus,
