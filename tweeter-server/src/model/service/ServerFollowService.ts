@@ -33,6 +33,22 @@ export class ServerFollowService extends Service {
 			(items) => this.populateUsers(items, (item) => item.alias, Object.assign),
 		);
 	}
+	public async loadMoreFollowerAliases(
+		token: string,
+		userAlias: string,
+		pageSize: number,
+		lastItemAlias: string | null,
+	): Promise<[string[], boolean]> {
+		return await this.getMoreItems(
+			token,
+			userAlias,
+			pageSize,
+			lastItemAlias,
+			(alias, limit, last) =>
+				this._daoFactory.makeFollowDAO().getPageOfFollowerAliases(alias, limit, last),
+			async () => {},
+		);
+	}
 
 	public async getIsFollowerStatus(token: string, userAlias: string, selectedUserAlias: string): Promise<boolean> {
 		this.checkParams(token, userAlias, selectedUserAlias);

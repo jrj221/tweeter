@@ -29,6 +29,11 @@ export interface FollowDAO {
 		pageSize: number,
 		lastItem: UserDTO | null,
 	): Promise<[UserDTO[], boolean]>;
+	getPageOfFollowerAliases(
+		followeeAlias: string,
+		pageSize: number,
+		lastItemAlias: string | null,
+	): Promise<[string[], boolean]>;
 	getPageOfFollowees(
 		followerAlias: string,
 		pageSize: number,

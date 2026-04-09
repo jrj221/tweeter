@@ -59,6 +59,24 @@ class DynamoDBFollowDAO extends DynamoDBDAO_1.DynamoDBDAO {
         }));
         return [followers, hasMore];
     }
+    async getPageOfFollowerAliases(followeeAlias, pageSize, lastItemAlias) {
+        const [items, hasMore] = await this.getPage({
+            TableName: this._tableName,
+            IndexName: this._indexName,
+            KeyConditionExpression: "#followeeAlias = :followeeAlias",
+            ExpressionAttributeNames: { "#followeeAlias": this._followeeAliasAttr },
+            ExpressionAttributeValues: { ":followeeAlias": followeeAlias },
+            Limit: pageSize,
+            ExclusiveStartKey: lastItemAlias === null
+                ? undefined
+                : {
+                    [this._followeeAliasAttr]: followeeAlias,
+                    [this._followerAliasAttr]: lastItemAlias,
+                },
+        });
+        const followerAliases = items.map((item) => item[this._followerAliasAttr]);
+        return [followerAliases, hasMore];
+    }
     async getPageOfFollowees(followerAlias, pageSize, lastItem) {
         const [items, hasMore] = await this.getPage({
             TableName: this._tableName,
