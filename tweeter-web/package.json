@@ -12,21 +12,20 @@
     "bootstrap": "^5.3.3",
     "buffer": "^6.0.3",
     "isomorphic-fetch": "^3.0.0",
-    "node": "^20.11.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.1",
     "react-dom": "^18.2.0",
     "react-infinite-scroll-component": "^6.1.0",
     "react-router-dom": "^6.22.2",
     "tweeter-shared": "file:../tweeter-shared",
-    "typescript": "^4.9.5",
+    "typescript": "^5.0.2",
     "vite-plugin-commonjs": "^0.8.2",
     "vite-plugin-dts": "2.3.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "vite",
-    "build": "tsc && vite build",
+    "build": "echo 'Starting type check...' && tsc && echo 'Type check complete. Starting Vite build...' && vite build",
     "serve": "vite preview",
     "reload": "npm run build && npm run serve",
     "test": "jest --passWithNoTests"

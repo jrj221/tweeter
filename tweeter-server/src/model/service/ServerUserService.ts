@@ -21,7 +21,6 @@ export class ServerUserService extends Service {
 
 	public async logout(token: string): Promise<void> {
 		this.checkParams(token);
-		await this.doAuthenticate(token);
 		const authTokenDAO = this._daoFactory.makeAuthTokenDAO();
 		await authTokenDAO.removeAuthToken(token);
 	}
