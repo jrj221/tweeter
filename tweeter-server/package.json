@@ -23,5 +23,8 @@
     "date-fns": "^3.3.1",
     "tweeter-shared": "file:../tweeter-shared",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.161"
   }
 }
