@@ -6,27 +6,48 @@ const DynamoDBFactory_1 = require("../../dao/DynamoDBDAO/DynamoDBFactory");
 const MessageQueue_1 = require("./MessageQueue");
 const handler = async (event) => {
     try {
+        const factory = new DynamoDBFactory_1.DynamoDBDAOFactory();
+        const followService = new ServerFollowService_1.ServerFollowService(factory);
+        const url = "https://sqs.us-east-1.amazonaws.com/735980888276/UpdateFeed";
         for (const record of event.Records) {
-            // Based on configured batch size
-            const postStatusMessage = JSON.parse(record.body); // More typechecking?
-            const followers = await getAllFollowers(postStatusMessage.followeeAlias, postStatusMessage.token);
-            const url = "https://sqs.us-east-1.amazonaws.com/735980888276/UpdateFeed";
-            const messages = [];
-            for (let i = 0; i < followers.length; i += 400) {
-                const followersSubset = followers.slice(i, i + 400);
+            const postStatusMessage = JSON.parse(record.body);
+            let lastFollowerAlias = null;
+            let hasMoreFollowers = true;
+            const followerBuffer = [];
+            const sqsBatch = [];
+            while (hasMoreFollowers) {
+                const [newFollowerAliases, more] = await followService.loadMoreFollowerAliases(postStatusMessage.token, postStatusMessage.followeeAlias, 100, lastFollowerAlias, false);
+                hasMoreFollowers = more;
+                followerBuffer.push(...newFollowerAliases);
+                if (newFollowerAliases.length > 0) {
+                    lastFollowerAlias = newFollowerAliases[newFollowerAliases.length - 1];
+                }
+                // Process full groups of 400 from the buffer
+                while (followerBuffer.length >= 400) {
+                    const followersSubset = followerBuffer.splice(0, 400);
+                    const message = {
+                        followerAliases: followersSubset,
+                        statusDTO: postStatusMessage.statusDTO,
+                        token: postStatusMessage.token,
+                    };
+                    sqsBatch.push(message);
+                    if (sqsBatch.length === 10) {
+                        await (0, MessageQueue_1.sendSQSMessageBatch)(url, sqsBatch);
+                        sqsBatch.length = 0;
+                    }
+                }
+            }
+            // After all pages for this record, handle leftovers
+            if (followerBuffer.length > 0) {
                 const message = {
-                    followerAliases: followersSubset,
+                    followerAliases: followerBuffer,
                     statusDTO: postStatusMessage.statusDTO,
                     token: postStatusMessage.token,
                 };
-                messages.push(message);
-                if (messages.length === 10) {
-                    await (0, MessageQueue_1.sendSQSMessageBatch)(url, messages);
-                    messages.length = 0;
-                }
+                sqsBatch.push(message);
             }
-            if (messages.length > 0) {
-                await (0, MessageQueue_1.sendSQSMessageBatch)(url, messages);
+            if (sqsBatch.length > 0) {
+                await (0, MessageQueue_1.sendSQSMessageBatch)(url, sqsBatch);
             }
         }
     }
@@ -36,18 +57,3 @@ const handler = async (event) => {
     }
 };
 exports.handler = handler;
-async function getAllFollowers(followeeAlias, token) {
-    const followService = new ServerFollowService_1.ServerFollowService(new DynamoDBFactory_1.DynamoDBDAOFactory());
-    const followers = [];
-    let lastFollowerAlias = null;
-    let hasMoreFollowers = true;
-    while (hasMoreFollowers) {
-        const [newFollowerAliases, more] = await followService.loadMoreFollowerAliases(token, followeeAlias, 100, lastFollowerAlias, false);
-        followers.push(...newFollowerAliases);
-        hasMoreFollowers = more;
-        if (newFollowerAliases.length > 0) {
-            lastFollowerAlias = newFollowerAliases[newFollowerAliases.length - 1];
-        }
-    }
-    return followers;
-}

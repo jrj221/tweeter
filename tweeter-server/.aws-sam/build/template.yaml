@@ -1298,7 +1298,7 @@ Resources:
           Type: SQS
           Properties:
             Queue: arn:aws:sqs:us-east-1:735980888276:UpdateFeed
-            BatchSize: 5
+            BatchSize: 1
             Enabled: true
       CodeUri: updateFeedsFunction
     Metadata:

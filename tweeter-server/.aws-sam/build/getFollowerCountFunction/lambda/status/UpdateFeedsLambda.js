@@ -4,10 +4,10 @@ exports.handler = void 0;
 const ServerStatusService_1 = require("../../model/service/ServerStatusService");
 const DynamoDBFactory_1 = require("../../dao/DynamoDBDAO/DynamoDBFactory");
 const handler = async (event) => {
-    console.log("Reached UpdateFeedLambda");
+    // console.log("Reached UpdateFeedLambda");
     try {
         for (const record of event.Records) {
-            console.log("In a record");
+            // console.log("In a record");
             // Based on configured batch size
             const updateFeedMessage = JSON.parse(record.body); // More typechecking?
             const statusService = new ServerStatusService_1.ServerStatusService(new DynamoDBFactory_1.DynamoDBDAOFactory());
@@ -16,7 +16,7 @@ const handler = async (event) => {
                 for (let j = 0; j < 4; j++) {
                     const followerBatch = updateFeedMessage.followerAliases.slice(i + j * 25, i + (j + 1) * 25);
                     if (followerBatch.length > 0) {
-                        console.log("Sending a batch feed write");
+                        // console.log("Sending a batch feed write");
                         await statusService.batchAddFeedItemsInternal(updateFeedMessage.statusDTO, followerBatch);
                     }
                 }
@@ -26,7 +26,7 @@ const handler = async (event) => {
                 }
             }
         }
-        console.log("finishing lambda");
+        // console.log("finishing lambda");
     }
     catch (error) {
         console.error("Error updating feeds:", error.message);
