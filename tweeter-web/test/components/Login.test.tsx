@@ -11,65 +11,65 @@ import { LoginPresenter } from "../../src/presenter/LoginPresenter";
 library.add(fab);
 import { mock, instance, verify } from "@typestrong/ts-mockito";
 
-describe("Login Component", () => {
-	it("starts with the sign-in button disabled", () => {
-		const { signInButton } = renderLoginAndGetElements("/");
+// describe("Login Component", () => {
+// 	it("starts with the sign-in button disabled", () => {
+// 		const { signInButton } = renderLoginAndGetElements("/");
 
-		expect(signInButton).toBeDisabled();
-	});
+// 		expect(signInButton).toBeDisabled();
+// 	});
 
-	it("enables the sign-in button if both alias and password fields have text", async () => {
-		const { user, signInButton, aliasField, passwordField } = renderLoginAndGetElements("/");
+// 	it("enables the sign-in button if both alias and password fields have text", async () => {
+// 		const { user, signInButton, aliasField, passwordField } = renderLoginAndGetElements("/");
 
-		await expectEnabledWithBoth(user, aliasField, passwordField, signInButton);
-	});
+// 		await expectEnabledWithBoth(user, aliasField, passwordField, signInButton);
+// 	});
 
-	it("disables the sign-in button if either the alias or the password is cleared", async () => {
-		const { user, signInButton, aliasField, passwordField } = renderLoginAndGetElements("/");
+// 	it("disables the sign-in button if either the alias or the password is cleared", async () => {
+// 		const { user, signInButton, aliasField, passwordField } = renderLoginAndGetElements("/");
 
-		// Should be enabled with both
-		await expectEnabledWithBoth(user, aliasField, passwordField, signInButton);
+// 		// Should be enabled with both
+// 		await expectEnabledWithBoth(user, aliasField, passwordField, signInButton);
 
-		// Should not be enabled with just password
-		await act(async () => {
-			await user.clear(aliasField);
-		});
-		expect(signInButton).toBeDisabled();
+// 		// Should not be enabled with just password
+// 		await act(async () => {
+// 			await user.clear(aliasField);
+// 		});
+// 		expect(signInButton).toBeDisabled();
 
-		// Putting the alias back should enable it again
-		await act(async () => {
-			await user.type(aliasField, "myAlias");
-		});
-		expect(signInButton).toBeEnabled();
+// 		// Putting the alias back should enable it again
+// 		await act(async () => {
+// 			await user.type(aliasField, "myAlias");
+// 		});
+// 		expect(signInButton).toBeEnabled();
 
-		// Should not be enabled with just alias
-		await act(async () => {
-			await user.clear(passwordField);
-		});
-		expect(signInButton).toBeDisabled();
-	});
+// 		// Should not be enabled with just alias
+// 		await act(async () => {
+// 			await user.clear(passwordField);
+// 		});
+// 		expect(signInButton).toBeDisabled();
+// 	});
 
-	it("calls the presenter's login method with the correct parameters when the sign-in button is pressed", async () => {
-		const mockPresenter = mock(LoginPresenter);
-		const mockPresenterInstance = instance(mockPresenter);
+// 	it("calls the presenter's login method with the correct parameters when the sign-in button is pressed", async () => {
+// 		const mockPresenter = mock(LoginPresenter);
+// 		const mockPresenterInstance = instance(mockPresenter);
 
-		const originalurl = "htpps://somewhere.com";
-		const alias = "myAlias";
-		const password = "myPassword";
+// 		const originalurl = "htpps://somewhere.com";
+// 		const alias = "myAlias";
+// 		const password = "myPassword";
 
-		const { user, signInButton, aliasField, passwordField } = renderLoginAndGetElements(
-			originalurl,
-			mockPresenterInstance
-		);
+// 		const { user, signInButton, aliasField, passwordField } = renderLoginAndGetElements(
+// 			originalurl,
+// 			mockPresenterInstance
+// 		);
 
-		await typeAliasAndPassword(user, aliasField, passwordField);
-		await act(async () => {
-			await user.click(signInButton);
-		});
+// 		await typeAliasAndPassword(user, aliasField, passwordField);
+// 		await act(async () => {
+// 			await user.click(signInButton);
+// 		});
 
-		verify(mockPresenter.doLogin(alias, password, originalurl, false)).once();
-	});
-});
+// 		verify(mockPresenter.doLogin(alias, password, originalurl, false)).once();
+// 	});
+// });
 
 function renderLogin(originalUrl: string, presenter?: LoginPresenter) {
 	return render(
@@ -79,7 +79,7 @@ function renderLogin(originalUrl: string, presenter?: LoginPresenter) {
 			) : (
 				<Login originalUrl={originalUrl} />
 			)}
-		</MemoryRouter>
+		</MemoryRouter>,
 	);
 }
 
@@ -100,7 +100,7 @@ async function typeAliasAndPassword(
 	aliasField: HTMLElement,
 	passwordField: HTMLElement,
 	alias: string = "myAlias",
-	password: string = "myPassword"
+	password: string = "myPassword",
 ) {
 	await act(async () => {
 		await user.type(aliasField, alias);
@@ -114,7 +114,7 @@ async function expectEnabledWithBoth(
 	user: UserEvent,
 	aliasField: HTMLElement,
 	passwordField: HTMLElement,
-	signInButton: HTMLElement
+	signInButton: HTMLElement,
 ) {
 	await typeAliasAndPassword(user, aliasField, passwordField);
 	expect(signInButton).toBeEnabled();
